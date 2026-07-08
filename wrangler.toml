@@ -1,0 +1,14 @@
+name = "joyaux-precieux-api"
+main = "worker/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "joyaux-precieux"
+database_id = "REPLACE_WITH_DATABASE_ID_AFTER_CREATION"
+
+# Secrets: set via `wrangler secret put ADMIN_PASSWORD` and `wrangler secret put ADMIN_SECRET`
+# For local dev, create a .dev.vars file:
+# ADMIN_PASSWORD=your_password
+# ADMIN_SECRET=your_long_random_secret

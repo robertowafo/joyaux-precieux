@@ -1,0 +1,8 @@
+{
+  "name": "Joyaux Précieux",
+  "description": "Un site chrétien dédié à la famille, la psychologie de l\u0027enfant, avec des conseils bibliques et des outils pratiques.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
