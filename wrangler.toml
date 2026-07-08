@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "joyaux-precieux"
-database_id = "REPLACE_WITH_DATABASE_ID_AFTER_CREATION"
+database_id = "6fcdbfbd-898d-450e-a747-61a5c8c4816b"
 
 # Secrets: set via `wrangler secret put ADMIN_PASSWORD` and `wrangler secret put ADMIN_SECRET`
 # For local dev, create a .dev.vars file:
