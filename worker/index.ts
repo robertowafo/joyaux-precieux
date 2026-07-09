@@ -1,5 +1,6 @@
 export interface Env {
   DB: D1Database;
+  MEDIA: R2Bucket;
   ADMIN_PASSWORD: string;
   ADMIN_SECRET: string;
 }
@@ -32,20 +33,23 @@ const TABLE_MAP: Record<string, string> = {
   pillars: 'pillars',
   steps: 'methodology_steps',
   audio: 'audio_capsules',
+  recommendations: 'video_recommendations',
 };
 
-// Safe column whitelist per table
 const ALLOWED_COLUMNS: Record<string, string[]> = {
   articles: ['title', 'desc', 'content', 'tag', 'date', 'read_time', 'img', 'author', 'role', 'featured'],
   videos: ['title', 'duration', 'desc', 'category', 'img', 'url', 'speaker'],
   books: ['title', 'author', 'rating', 'desc', 'benefits', 'img'],
-  pdf_resources: ['title', 'desc', 'type', 'color', 'accent', 'badge', 'img'],
+  pdf_resources: ['title', 'desc', 'type', 'color', 'accent', 'badge', 'img', 'file_url'],
   faqs: ['question', 'answer', 'order_idx'],
   testimonials: ['text', 'author', 'role', 'rating', 'img'],
   pillars: ['title', 'desc', 'icon', 'badge', 'time', 'order_idx'],
   methodology_steps: ['ref', 'title', 'desc', 'order_idx'],
-  audio_capsules: ['title', 'duration', 'duration_sec', 'speaker', 'desc', 'bg_color', 'accent', 'badge'],
+  audio_capsules: ['title', 'duration', 'duration_sec', 'speaker', 'desc', 'bg_color', 'accent', 'badge', 'audio_url'],
+  video_recommendations: ['title', 'url', 'platform', 'desc', 'thumbnail'],
 };
+
+const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'mp3', 'wav', 'ogg', 'm4a', 'mp4', 'webm', 'pdf'];
 
 async function handleResource(
   request: Request,
@@ -112,11 +116,10 @@ export default {
 
     const url = new URL(request.url);
     const parts = url.pathname.split('/').filter(Boolean);
-    // Expected: ['api', 'resource', 'id?']
 
     if (parts[0] !== 'api') return json({ error: 'Not found' }, 404);
 
-    // POST /api/auth  → login
+    // ── POST /api/auth ──────────────────────────────────────────────────────
     if (parts[1] === 'auth' && request.method === 'POST') {
       const body = (await request.json()) as { password: string };
       if (body.password === env.ADMIN_PASSWORD) {
@@ -125,26 +128,95 @@ export default {
       return json({ error: 'Mot de passe incorrect' }, 401);
     }
 
-    // GET /api/stats  → counts per table
+    // ── GET /api/stats ──────────────────────────────────────────────────────
     if (parts[1] === 'stats' && request.method === 'GET') {
-      const tables = Object.values(TABLE_MAP);
+      const keys = [...Object.keys(TABLE_MAP), 'emails', 'recommendations'];
+      const allTables = { ...TABLE_MAP, emails: 'emails', recommendations: 'video_recommendations' };
       const counts = await Promise.all(
-        tables.map(t =>
-          env.DB.prepare(`SELECT COUNT(*) as count FROM ${t}`).first<{ count: number }>()
+        keys.map(k =>
+          env.DB.prepare(`SELECT COUNT(*) as count FROM ${allTables[k]}`).first<{ count: number }>()
         )
       );
       const result: Record<string, number> = {};
-      Object.keys(TABLE_MAP).forEach((key, i) => {
-        result[key] = counts[i]?.count ?? 0;
-      });
+      keys.forEach((key, i) => { result[key] = counts[i]?.count ?? 0; });
       return json(result);
     }
 
-    // CRUD routes: /api/<resource>[/<id>]
+    // ── POST /api/upload ────────────────────────────────────────────────────
+    if (parts[1] === 'upload' && request.method === 'POST') {
+      if (!requireAuth(request, env)) return json({ error: 'Unauthorized' }, 401);
+      const ct = request.headers.get('Content-Type') ?? '';
+      if (!ct.includes('multipart/form-data')) {
+        return json({ error: 'multipart/form-data requis' }, 400);
+      }
+      const formData = await request.formData();
+      const file = formData.get('file') as File | null;
+      if (!file || !(file instanceof File)) return json({ error: 'Aucun fichier fourni' }, 400);
+
+      const rawExt = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
+      if (!ALLOWED_EXTENSIONS.includes(rawExt)) {
+        return json({ error: `Type de fichier non autorisé (.${rawExt})` }, 400);
+      }
+
+      const rand = Math.random().toString(36).slice(2, 8);
+      const key = `${Date.now()}-${rand}.${rawExt}`;
+      await env.MEDIA.put(key, file.stream(), {
+        httpMetadata: { contentType: file.type || 'application/octet-stream' },
+      });
+
+      const fileUrl = `${url.origin}/api/files/${key}`;
+      return json({ url: fileUrl, key });
+    }
+
+    // ── GET /api/files/:key ─────────────────────────────────────────────────
+    if (parts[1] === 'files' && parts[2]) {
+      const key = parts.slice(2).join('/');
+      const object = await env.MEDIA.get(key);
+      if (!object) return new Response('Not found', { status: 404, headers: CORS });
+      return new Response(object.body, {
+        headers: {
+          ...CORS,
+          'Content-Type': object.httpMetadata?.contentType ?? 'application/octet-stream',
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        },
+      });
+    }
+
+    // ── /api/emails ─────────────────────────────────────────────────────────
+    if (parts[1] === 'emails') {
+      // Public: subscribe
+      if (request.method === 'POST' && !parts[2]) {
+        const body = (await request.json()) as { email?: string; name?: string; source?: string };
+        if (!body.email || !body.email.includes('@')) {
+          return json({ error: 'Adresse email invalide' }, 400);
+        }
+        try {
+          await env.DB.prepare(
+            `INSERT INTO emails (email, name, source) VALUES (?, ?, ?) ON CONFLICT(email) DO NOTHING`
+          ).bind(body.email.toLowerCase().trim(), body.name ?? '', body.source ?? 'newsletter').run();
+          return json({ success: true, message: 'Inscription réussie !' });
+        } catch {
+          return json({ error: 'Erreur serveur' }, 500);
+        }
+      }
+      // Auth required for list & delete
+      if (!requireAuth(request, env)) return json({ error: 'Unauthorized' }, 401);
+      if (request.method === 'GET') {
+        const { results } = await env.DB.prepare(
+          `SELECT * FROM emails ORDER BY created_at DESC`
+        ).all();
+        return json(results);
+      }
+      if (request.method === 'DELETE' && parts[2]) {
+        await env.DB.prepare(`DELETE FROM emails WHERE id = ?`).bind(parts[2]).run();
+        return json({ success: true });
+      }
+    }
+
+    // ── Generic CRUD: /api/<resource>[/<id>] ────────────────────────────────
     const resource = parts[1];
     const id = parts[2] ?? null;
     const table = TABLE_MAP[resource];
-
     if (!table) return json({ error: 'Resource not found' }, 404);
 
     return handleResource(request, env, table, id);

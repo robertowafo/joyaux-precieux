@@ -6,5 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+!.env.production
 .dev.vars
 .wrangler/
+
+public/images/*.jpg
+public/images/*.jpeg
+public/images/*.png

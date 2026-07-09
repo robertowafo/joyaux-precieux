@@ -94,6 +94,26 @@ CREATE TABLE IF NOT EXISTS methodology_steps (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Emails collectés (newsletter / contact)
+CREATE TABLE IF NOT EXISTS emails (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL DEFAULT '',
+  source TEXT NOT NULL DEFAULT 'newsletter',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Vidéos recommandées (liens externes)
+CREATE TABLE IF NOT EXISTS video_recommendations (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  url TEXT NOT NULL,
+  platform TEXT NOT NULL DEFAULT 'YouTube',
+  desc TEXT NOT NULL DEFAULT '',
+  thumbnail TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Capsules audio (Minutes Précieuses)
 CREATE TABLE IF NOT EXISTS audio_capsules (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

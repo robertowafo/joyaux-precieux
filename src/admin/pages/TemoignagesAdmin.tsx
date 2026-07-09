@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Layout } from '../components/Layout';
 import { DataTable, Column } from '../components/DataTable';
 import { Modal } from '../components/Modal';
+import { FileUpload } from '../components/FileUpload';
 import { api } from '../lib/api';
 
 interface Testimonial {
@@ -14,14 +15,13 @@ interface Testimonial {
 }
 
 const EMPTY: Omit<Testimonial, 'id'> = {
-  text: '',
-  author: '',
-  role: '',
-  rating: 5,
-  img: '/images/avatar_1_young_mother.jpg',
+  text: '', author: '', role: '', rating: 5, img: '',
 };
 
 const COLUMNS: Column<Testimonial>[] = [
+  { key: 'img', label: '', render: v => v ? (
+    <img src={String(v)} alt="" className="w-8 h-8 object-cover rounded-full bg-gray-100" />
+  ) : <div className="w-8 h-8 bg-gray-100 rounded-full" /> },
   { key: 'author', label: 'Auteur' },
   { key: 'role', label: 'Rôle', truncate: true },
   { key: 'text', label: 'Témoignage', truncate: true },
@@ -29,6 +29,7 @@ const COLUMNS: Column<Testimonial>[] = [
 ];
 
 const input = 'w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1f4a38]/20 focus:border-[#1f4a38] transition-all';
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div><label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{label}</label>{children}</div>;
 }
@@ -41,7 +42,10 @@ export function TemoignagesAdmin() {
   const [form, setForm] = useState<Partial<Testimonial>>(EMPTY);
   const [editId, setEditId] = useState<number | null>(null);
 
-  const load = () => { setLoading(true); api.list<Testimonial>('testimonials').then(setData).finally(() => setLoading(false)); };
+  const load = () => {
+    setLoading(true);
+    api.list<Testimonial>('testimonials').then(setData).finally(() => setLoading(false));
+  };
   useEffect(load, []);
 
   const openAdd = () => { setForm(EMPTY); setEditId(null); setModalOpen(true); };
@@ -52,35 +56,48 @@ export function TemoignagesAdmin() {
     try {
       if (editId) await api.update<Testimonial>('testimonials', editId, form);
       else await api.create<Testimonial>('testimonials', form);
-      setModalOpen(false); load();
-    } catch (e: any) { alert('Erreur : ' + e.message); }
+      setModalOpen(false);
+      load();
+    } catch (e: unknown) { alert('Erreur : ' + (e instanceof Error ? e.message : '')); }
     finally { setSaving(false); }
   };
 
   const handleDelete = async (id: number) => {
     if (!confirm('Supprimer ce témoignage ?')) return;
-    await api.remove('testimonials', id); load();
+    await api.remove('testimonials', id);
+    load();
   };
 
   const set = (f: keyof Testimonial, v: string | number) => setForm(p => ({ ...p, [f]: v }));
 
   return (
     <Layout title="Témoignages">
-      <DataTable data={data} columns={COLUMNS} onEdit={openEdit} onDelete={handleDelete} onAdd={openAdd} isLoading={loading} addLabel="Nouveau témoignage" />
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modifier le témoignage' : 'Nouveau témoignage'} onSubmit={handleSave} isLoading={saving}>
-        <Field label="Témoignage (texte entre « »)">
-          <textarea className={`${input} h-32 resize-none`} value={form.text ?? ''} onChange={e => set('text', e.target.value)} placeholder="« Votre témoignage... »" />
+      <DataTable data={data} columns={COLUMNS} onEdit={openEdit} onDelete={handleDelete}
+        onAdd={openAdd} isLoading={loading} addLabel="Nouveau témoignage" />
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}
+        title={editId ? 'Modifier le témoignage' : 'Nouveau témoignage'} onSubmit={handleSave} isLoading={saving}>
+        <Field label="Témoignage">
+          <textarea className={`${input} h-32 resize-none`} value={form.text ?? ''}
+            onChange={e => set('text', e.target.value)}
+            placeholder="« Décrivez ici votre expérience... »" />
         </Field>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Prénom / Nom"><input className={input} value={form.author ?? ''} onChange={e => set('author', e.target.value)} placeholder="Sarah" /></Field>
-          <Field label="Rôle"><input className={input} value={form.role ?? ''} onChange={e => set('role', e.target.value)} placeholder="Maman de Lucas (14 ans)" /></Field>
+          <Field label="Prénom / Nom">
+            <input className={input} value={form.author ?? ''} onChange={e => set('author', e.target.value)} placeholder="Sarah" />
+          </Field>
+          <Field label="Rôle / Contexte">
+            <input className={input} value={form.role ?? ''} onChange={e => set('role', e.target.value)} placeholder="Maman de Lucas (14 ans)" />
+          </Field>
         </div>
-        <Field label="Note (1-5)">
+        <Field label="Note (étoiles)">
           <select className={input} value={form.rating ?? 5} onChange={e => set('rating', Number(e.target.value))}>
-            {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} étoile{n > 1 ? 's' : ''}</option>)}
+            {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} étoile{n > 1 ? 's' : ''} {'⭐'.repeat(n)}</option>)}
           </select>
         </Field>
-        <Field label="Image avatar (/images/...)"><input className={input} value={form.img ?? ''} onChange={e => set('img', e.target.value)} placeholder="/images/avatar_1_young_mother.jpg" /></Field>
+        <Field label="Photo du témoin (optionnelle)">
+          <FileUpload value={form.img ?? ''} onChange={v => set('img', v)}
+            accept="image/*" label="une photo" previewType="image" />
+        </Field>
       </Modal>
     </Layout>
   );
