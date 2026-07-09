@@ -1,33 +1,26 @@
-import { motion } from 'motion/react';
-import { BookOpen, Calendar, ArrowUpRight } from 'lucide-react';
+import { useEffect, useState } from ‘react’;
+import { motion } from ‘motion/react’;
+import { BookOpen, Calendar, ArrowUpRight } from ‘lucide-react’;
+import { publicApi } from ‘../lib/publicApi’;
+
+interface Article {
+  id: number;
+  title: string;
+  desc: string;
+  tag: string;
+  date: string;
+  readTime: string;
+  img: string;
+}
 
 export function ArticlesSection() {
-  const articles = [
-    {
-      title: "Mettre en place des routines sécurisantes de retour à la maison",
-      desc: "L'importance des rituels de transition psychologiques pour abaisser le niveau de vigilance et d'anxiété de l'enfant de retour chez lui après sa journée scolaire.",
-      tag: "Psychologie",
-      date: "25 Mai 2026",
-      readTime: "4 min de lecture",
-      img: "/images/article_1_mother_speaking.jpg"
-    },
-    {
-      title: "Gérer la rivalité fraternelle et la jalousie au quotidien",
-      desc: "Des outils de guidance bienveillante inspirés des neurosciences affectives pour pacifier les débordements relationnels entre frères et sœurs.",
-      tag: "Parentalité",
-      date: "18 Mai 2026",
-      readTime: "5 min de lecture",
-      img: "/images/article_2_wooden_toys.jpg"
-    },
-    {
-      title: "Mon adolescent s’isole : comprendre son repli et rebâtir le lien verbal",
-      desc: "Dans un monde hyperconnected aux écrans mais de plus en plus isolé verbalement, comment appréhender cliniquement le retrait d'un ado, instaurer des sas d'écoute mutuelle sans forcer le passage, et l'accompagner vers son identité profonde.",
-      tag: "Adolescents & Foi",
-      date: "10 Mai 2026",
-      readTime: "8 min de lecture",
-      img: "/images/article_3_father_teenager.jpg"
-    }
-  ];
+  const [articles, setArticles] = useState<Article[]>([]);
+
+  useEffect(() => {
+    publicApi.articles().then(data => {
+      if (data.length > 0) setArticles((data as unknown as Article[]).slice(0, 3));
+    });
+  }, []);
 
   return (
     <section id="articles" className="py-24 md:py-36 px-6 lg:px-12 max-w-[90rem] mx-auto border-t border-lead-green/10 bg-bg">
@@ -104,6 +97,7 @@ export function ArticlesSection() {
         </div>
 
         {/* Third grand horizontal full-width article to rhythm the view */}
+        {articles[2] && (
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -112,9 +106,9 @@ export function ArticlesSection() {
           className="lg:col-span-2 bg-white rounded-[2.5rem] overflow-hidden border border-lead-green/5 shadow-sm hover:shadow-xl transition-all duration-500 group cursor-pointer flex flex-col md:flex-row"
         >
           <div className="md:w-1/2 relative aspect-[16/10] md:aspect-auto min-h-[240px] md:min-h-[380px] bg-mint shrink-0">
-             <img 
-               src={articles[2].img} 
-               alt={articles[2].title} 
+             <img
+               src={articles[2].img}
+               alt={articles[2].title}
                className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                referrerPolicy="no-referrer"
              />
@@ -135,7 +129,7 @@ export function ArticlesSection() {
                 <h3 className="text-2xl md:text-3xl font-bold text-lead-green mb-4 leading-tight group-hover:text-coral transition-colors">
                   {articles[2].title}
                 </h3>
-                
+
                 <p className="text-sm md:text-base font-medium text-lead-green/75 leading-relaxed mb-6">
                   {articles[2].desc}
                 </p>
@@ -149,6 +143,7 @@ export function ArticlesSection() {
              </div>
           </div>
         </motion.div>
+        )}
 
       </div>
     </section>

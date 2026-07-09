@@ -1,54 +1,34 @@
-import { Sparkles, Download, Heart, Flame, ShieldAlert, BadgeInfo } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Download, Flame } from 'lucide-react';
 import { motion } from 'motion/react';
+import { publicApi } from '../lib/publicApi';
+
+interface PdfTool {
+  id: number;
+  title: string;
+  desc: string;
+  type: string;
+  color: string;
+  accent: string;
+  badge: string;
+  img: string;
+  file_url: string;
+}
+
+const STATIC_TOOLS: PdfTool[] = [
+  { id: 1, title: "La Boussole des Émotions", desc: "Une fiche psycho-éducative basée sur les Psaumes pour aider l'enfant à nommer sa colère, sa tristesse et sa joie devant Dieu.", type: "📥 KIT PDF À IMPRIMER", color: "bg-mint border-lead-green/10", accent: "text-lead-green", badge: "🌱 Psychologie de l'enfant", img: "/images/resource_2_emotion_journal.jpg", file_url: "" },
+  { id: 2, title: "Planning de Vacances Utiles", desc: "7 jours de routines équilibrées alliant sport, repos, ateliers de créativité et rendez-vous spirituels bénis.", type: "📥 GUIDE PRATIQUE", color: "bg-yellow-bg border-highlight/10", accent: "text-[#ff9d00]", badge: "🗓️ Routine & Camps", img: "/images/resource_1_guide_pdf.jpg", file_url: "" },
+  { id: 3, title: "Le Code de Grâce & Vérité", desc: "Un protocole en 3 étapes clefs pour résoudre les disputes entre frères et sœurs selon les enseignements d'Éphésiens 4.", type: "📥 FICHE DE DISCIPLINE", color: "bg-[#fbebeb] border-coral/10", accent: "text-coral", badge: "🙏 Conseils Bibliques", img: "/images/resource_3_discipline_cards.jpg", file_url: "" },
+];
 
 export function PracticalTools() {
-  const tools = [
-    {
-      title: "La Boussole des Émotions",
-      desc: "Une fiche psycho-éducative basée sur les Psaumes pour aider l'enfant à nommer sa colère, sa tristesse et sa joie devant Dieu.",
-      type: "📥 KIT PDF À IMPRIMER",
-      color: "bg-mint border-lead-green/10",
-      accent: "text-lead-green",
-      badge: "🌱 Psychologie de l'enfant",
-      img: "/images/resource_2_emotion_journal.jpg"
-    },
-    {
-      title: "Planning de Vacances Utiles",
-      desc: "7 jours de routines équilibrées alliant sport, repos, ateliers de créativité et rendez-vous spirituels bénis.",
-      type: "📥 GUIDE PRATIQUE",
-      color: "bg-yellow-bg border-highlight/10",
-      accent: "text-[#ff9d00]",
-      badge: "🗓️ Routine & Camps",
-      img: "/images/resource_1_guide_pdf.jpg"
-    },
-    {
-      title: "Le Code de Grâce & Vérité",
-      desc: "Un protocole en 3 étapes clefs pour résoudre les disputes entre frères et sœurs selon les enseignements d'Éphésiens 4.",
-      type: "📥 FICHE DE DISCIPLINE SANS PROBLÈME",
-      color: "bg-[#fbebeb] border-coral/10",
-      accent: "text-coral",
-      badge: "🙏 Conseils Bibliques",
-      img: "/images/resource_3_discipline_cards.jpg"
-    },
-    {
-      title: "La Météo Personnelle du Foyer",
-      desc: "Un kit de dialogue familial hebdomadaire pour permettre à chacun d'exprimer son humeur, ses besoins et ses motifs de prière.",
-      type: "📥 KIT DE DIALOGUE INTERACTIF",
-      color: "bg-mint border-lead-green/10",
-      accent: "text-lead-green",
-      badge: "☀️ Expression libre",
-      img: "/images/resource_1_guide_pdf.jpg"
-    },
-    {
-      title: "Le Tableau des Petits Pas",
-      desc: "Une fiche de renforcement positif et bienveillant pour guider l'autonomie et valoriser chaque effort quotidien de l'enfant.",
-      type: "📥 COMPTEUR DE RÉUSSITES",
-      color: "bg-yellow-bg border-highlight/10",
-      accent: "text-[#ff9d00]",
-      badge: "🌟 Autonomie & Estime",
-      img: "/images/resource_2_emotion_journal.jpg"
-    }
-  ];
+  const [tools, setTools] = useState<PdfTool[]>(STATIC_TOOLS);
+
+  useEffect(() => {
+    publicApi.resources().then(data => {
+      if (data.length > 0) setTools(data as unknown as PdfTool[]);
+    });
+  }, []);
 
   return (
     <section id="outils" className="py-24 md:py-36 px-6 lg:px-12 max-w-[90rem] mx-auto bg-bg border-t border-lead-green/10">
@@ -109,9 +89,16 @@ export function PracticalTools() {
 
               <div className="border-t border-lead-green/5 pt-5 flex items-center justify-between mt-auto">
                  <span className="text-xs font-bold text-lead-green/60 font-friendly">Prend 2 min • PDF Gratuit</span>
-                 <div className="w-10 h-10 rounded-full bg-lead-green text-white flex items-center justify-center group-hover:bg-highlight transition-colors shadow-sm">
-                    <Download size={16} />
-                 </div>
+                 {tool.file_url ? (
+                   <a href={tool.file_url} download target="_blank" rel="noopener noreferrer"
+                     className="w-10 h-10 rounded-full bg-lead-green text-white flex items-center justify-center group-hover:bg-highlight transition-colors shadow-sm">
+                     <Download size={16} />
+                   </a>
+                 ) : (
+                   <div className="w-10 h-10 rounded-full bg-lead-green/30 text-white flex items-center justify-center shadow-sm">
+                     <Download size={16} />
+                   </div>
+                 )}
               </div>
             </div>
           </motion.div>

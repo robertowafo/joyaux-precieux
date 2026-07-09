@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, Calendar, ArrowUpRight, Search, X, Clock, Heart, Sparkles, Send, Check, Bookmark, HelpCircle, ShieldCheck, Download, Award, AlertCircle } from 'lucide-react';
 import { ThreeArticlesBackground } from './ThreeArticlesBackground';
 import { gsap } from 'gsap';
+import { publicApi } from '../lib/publicApi';
 
 interface Article {
   id: number;
@@ -67,7 +68,15 @@ export function ArticlesPage() {
 
   const categories = ["Tous", "Psychologie", "Parentalité", "Adolescents & Foi", "Spiritualité"];
 
-  const articles: Article[] = [
+  const [articles, setArticles] = useState<Article[]>([]);
+
+  useEffect(() => {
+    publicApi.articles().then(data => {
+      if (data.length > 0) setArticles(data as unknown as Article[]);
+    });
+  }, []);
+
+  const STATIC_ARTICLES: Article[] = [
     {
       id: 3,
       title: "Mon adolescent s’isole : comprendre son repli et rebâtir le lien verbal",
@@ -167,10 +176,10 @@ export function ArticlesPage() {
     }
   ];
 
-  const featuredArticle = articles.find(art => art.featured) || articles[0];
-  const regularArticles = articles.filter(art => !art.featured);
+  const displayArticles = articles.length > 0 ? articles : STATIC_ARTICLES;
+  const featuredArticle = displayArticles.find(art => art.featured) || displayArticles[0];
 
-  const filteredArticles = articles.filter(art => {
+  const filteredArticles = displayArticles.filter(art => {
     const matchesSearch = art.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           art.desc.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === 'Tous' || art.tag === activeCategory;
@@ -246,7 +255,7 @@ export function ArticlesPage() {
       </section>
 
       {/* 2. Flagship Featured Article Banner component (RETAINS & CONVERTS) */}
-      {searchQuery === '' && activeCategory === 'Tous' && (
+      {searchQuery === '' && activeCategory === 'Tous' && featuredArticle && (
         <section className="px-6 lg:px-12 pb-20 max-w-7xl mx-auto">
           <div className="bg-white rounded-[3rem] border border-lead-green/10 p-6 md:p-10 shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 py-2.5 px-4 bg-[#ff9d00] text-white font-friendly font-bold text-[10px] uppercase tracking-widest rounded-bl-2xl">
