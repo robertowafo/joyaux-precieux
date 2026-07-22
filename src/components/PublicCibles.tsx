@@ -49,7 +49,7 @@ export function PublicCibles() {
       badgeBg: "bg-[#e05a47]/10 text-[#e05a47]",
       avatarGlow: "shadow-[0_0_40px_rgba(224,90,71,0.24)]",
       accentColor: "#e05a47",
-      illustrations: "/images/target_4_adult_family.jpg"
+      illustrations: "/images/target_4_spiritual_prayer.jpg"
     },
     {
       id: "children-teens",
