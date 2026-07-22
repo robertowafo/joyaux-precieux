@@ -9,7 +9,7 @@ async function get<T>(resource: string): Promise<T[]> {
 
 export const publicApi = {
   articles: () => get<Record<string, unknown>>('articles'),
-  audio:    () => get<Record<string, unknown>>('audio'),
+  videoCapsules: () => get<Record<string, unknown>>('video_capsules'),
   resources:() => get<Record<string, unknown>>('resources'),
   faqs:     () => get<Record<string, unknown>>('faqs'),
   videos:   () => get<Record<string, unknown>>('videos'),

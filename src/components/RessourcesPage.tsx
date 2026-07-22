@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, Download, BookOpen, Volume2, Video, FileText, Sparkles, Heart, Check, X, ShieldAlert } from 'lucide-react';
-import { AudioCapsules } from './AudioCapsules';
+import { VideoCapsules } from './VideoCapsules';
 import { PracticalTools } from './PracticalTools';
 import { StorySpinner } from './StorySpinner';
 
@@ -31,7 +31,7 @@ export function RessourcesPage() {
 
   const categories = [
     { id: 'tous', label: 'Tout explorer', icon: '🚀' },
-    { id: 'audio', label: 'Minutes Précieuses (Audio)', icon: '🎙️' },
+    { id: 'audio', label: 'Minutes Précieuses (Vidéo)', icon: '🎥' },
     { id: 'video', label: 'Vidéos & Conférences', icon: '🎥' },
     { id: 'pdf', label: 'Guides & Fiches PDF', icon: '📥' },
     { id: 'livre', label: 'Livres Recommandés', icon: '📚' }
@@ -153,7 +153,7 @@ export function RessourcesPage() {
         </div>
         
         <p className="text-base sm:text-lg text-lead-green/75 max-w-2xl mx-auto font-friendly font-semibold leading-relaxed">
-          Toutes nos fiches psycho-éducatives gratuites, capsules audio de guidance pour parents pressés, enregistrements vidéo précieux et littérature jeunesse sélectionnée.
+          Toutes nos fiches psycho-éducatives gratuites, capsules vidéo de guidance pour parents pressés, enregistrements vidéo précieux et littérature jeunesse sélectionnée.
         </p>
       </section>
 
@@ -211,8 +211,8 @@ export function RessourcesPage() {
             viewport={{ once: true, margin: "-120px" }}
             className="border-t border-lead-green/10 pt-12"
           >
-            {/* Audio Capsules is dynamically embedded here with full functionality */}
-            <AudioCapsules />
+            {/* Video Capsules is dynamically embedded here with full functionality */}
+            <VideoCapsules />
           </motion.div>
         )}
 

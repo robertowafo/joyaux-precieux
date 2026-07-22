@@ -6,7 +6,7 @@ import { Dashboard } from './pages/Dashboard';
 import { ArticlesAdmin } from './pages/ArticlesAdmin';
 import { VideosAdmin } from './pages/VideosAdmin';
 import { VideoRecoAdmin } from './pages/VideoRecoAdmin';
-import { AudioAdmin } from './pages/AudioAdmin';
+import { VideoCapsulesAdmin } from './pages/VideoCapsulesAdmin';
 import { RessourcesAdmin } from './pages/RessourcesAdmin';
 import { LivresAdmin } from './pages/LivresAdmin';
 import { FaqAdmin } from './pages/FaqAdmin';
@@ -34,7 +34,7 @@ export function AdminApp() {
       <Route path="/articles" element={<G><ArticlesAdmin /></G>} />
       <Route path="/videos" element={<G><VideosAdmin /></G>} />
       <Route path="/recommendations" element={<G><VideoRecoAdmin /></G>} />
-      <Route path="/audio" element={<G><AudioAdmin /></G>} />
+      <Route path="/video-capsules" element={<G><VideoCapsulesAdmin /></G>} />
       <Route path="/resources" element={<G><RessourcesAdmin /></G>} />
       <Route path="/books" element={<G><LivresAdmin /></G>} />
       <Route path="/faqs" element={<G><FaqAdmin /></G>} />

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { auth } from '../lib/auth';
 import {
-  LayoutDashboard, FileText, Video, Music, Download,
+  LayoutDashboard, FileText, Video, Clapperboard, Download,
   BookOpen, HelpCircle, Star, Users, LogOut, Menu,
   ChevronRight, Youtube, Mail
 } from 'lucide-react';
@@ -12,7 +12,7 @@ const NAV = [
   { label: 'Articles', path: '/admin/articles', icon: FileText },
   { label: 'Vidéos', path: '/admin/videos', icon: Video },
   { label: 'Vidéos Recommandées', path: '/admin/recommendations', icon: Youtube },
-  { label: 'Audio', path: '/admin/audio', icon: Music },
+  { label: 'Capsules Vidéo', path: '/admin/video-capsules', icon: Clapperboard },
   { label: 'Ressources PDF', path: '/admin/resources', icon: Download },
   { label: 'Livres', path: '/admin/books', icon: BookOpen },
   { label: 'FAQ', path: '/admin/faqs', icon: HelpCircle },

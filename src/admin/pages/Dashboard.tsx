@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { api } from '../lib/api';
 import {
-  FileText, Video, Music, Download, BookOpen,
+  FileText, Video, Clapperboard, Download, BookOpen,
   HelpCircle, Star, Users, ArrowRight, Youtube, Mail
 } from 'lucide-react';
 
@@ -11,7 +11,7 @@ const CARDS = [
   { key: 'articles', label: 'Articles', icon: FileText, color: 'bg-emerald-50 text-emerald-700', border: 'border-emerald-100', path: '/admin/articles' },
   { key: 'videos', label: 'Vidéos', icon: Video, color: 'bg-blue-50 text-blue-700', border: 'border-blue-100', path: '/admin/videos' },
   { key: 'recommendations', label: 'Vidéos recommandées', icon: Youtube, color: 'bg-red-50 text-red-700', border: 'border-red-100', path: '/admin/recommendations' },
-  { key: 'audio', label: 'Capsules Audio', icon: Music, color: 'bg-purple-50 text-purple-700', border: 'border-purple-100', path: '/admin/audio' },
+  { key: 'video_capsules', label: 'Capsules Vidéo', icon: Clapperboard, color: 'bg-purple-50 text-purple-700', border: 'border-purple-100', path: '/admin/video-capsules' },
   { key: 'resources', label: 'Ressources PDF', icon: Download, color: 'bg-orange-50 text-orange-700', border: 'border-orange-100', path: '/admin/resources' },
   { key: 'books', label: 'Livres', icon: BookOpen, color: 'bg-amber-50 text-amber-700', border: 'border-amber-100', path: '/admin/books' },
   { key: 'faqs', label: 'FAQ', icon: HelpCircle, color: 'bg-cyan-50 text-cyan-700', border: 'border-cyan-100', path: '/admin/faqs' },
@@ -38,7 +38,7 @@ export function Dashboard() {
         <div className="bg-[#1f4a38] text-white rounded-2xl p-6">
           <h2 className="text-lg font-bold mb-1">Bienvenue dans l'espace admin</h2>
           <p className="text-white/70 text-sm">
-            Gérez tout le contenu du site Joyaux Précieux — articles, vidéos, audio, ressources et bien plus.
+            Gérez tout le contenu du site Joyaux Précieux — articles, vidéos, capsules, ressources et bien plus.
           </p>
         </div>
 

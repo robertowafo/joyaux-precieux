@@ -211,8 +211,8 @@ INSERT INTO methodology_steps (ref, title, desc, order_idx) VALUES
 ('02', 'Analyse psychologique fine', 'Nous identifions les freins de communication à la lumière de la Psychologie du Développement positive et de l''équilibre spirituel.', 1),
 ('03', 'Plan d''action restaurateur', 'Mise en place de rituels de transition, fiches de routines, cadres réparateurs à tester et réévaluer ensemble en séances régulières.', 2);
 
--- Capsules audio
-INSERT INTO audio_capsules (title, duration, duration_sec, speaker, desc, bg_color, accent, badge) VALUES
+-- Capsules vidéo
+INSERT INTO video_capsules (title, duration, duration_sec, speaker, desc, bg_color, accent, badge) VALUES
 ('Désamorcer une crise de colère en public', '04:00', 240, 'Lina NGUERELESSIO', 'Des repères psycho-éducatifs immédiats pour calmer le débordement émotionnel sans utiliser la violence ou les cris devant les regards extérieurs.', 'bg-mint', 'text-lead-green', '👶 Petite Enfance • 4 min'),
 ('Mon ado s''isole : comment réagir sans braquer ?', '05:00', 300, 'Lina NGUERELESSIO', 'Comprendre les frontières de l''intimité d''un adolescent et recréer un espace d''écoute sain et serein au sein de la maison.', 'bg-yellow-bg', 'text-[#ff9d00]', '🧑 Adolescence • 5 min'),
 ('Mettre en place des limites saines sans crier', '03:30', 210, 'Lina NGUERELESSIO', 'Comment asseoir une autorité bienveillante et ferme en transmettant de l''assurance et la paix à vos enfants.', 'bg-[#fbebeb]', 'text-coral', '👪 Guidance • 3 min 30'),

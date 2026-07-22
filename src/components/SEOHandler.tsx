@@ -29,7 +29,7 @@ export function SEOHandler({ currentPage }: SEOHandlerProps) {
         break;
       case 'ressources':
         title = "Ressources Psycho-éducatives & Boîte à Outils | Joyaux Précieux";
-        description = "Fiches cliniques téléchargeables gratuites, capsules audio de guidance pour parents pressés, enregistrements vidéo et littérature jeunesse.";
+        description = "Fiches cliniques téléchargeables gratuites, capsules vidéo de guidance pour parents pressés, enregistrements vidéo et littérature jeunesse.";
         canonicalSuffix = "#ressources";
         break;
       case 'plan':
@@ -260,9 +260,9 @@ export function SEOHandler({ currentPage }: SEOHandlerProps) {
             "description": "Fiches psycho-éducatives téléchargeables gratuitement sur l'autonomie, l'expression saine et la résilience émotionnelle."
           },
           {
-            "@type": "AudioObject",
-            "name": "Capsules Vocales de Guidance",
-            "description": "Enregistrements audio éducatifs courts pour guider les parents pressés vers des relations sereines."
+            "@type": "VideoObject",
+            "name": "Capsules Vidéo de Guidance",
+            "description": "Enregistrements vidéo éducatifs courts pour guider les parents pressés vers des relations sereines."
           }
         ]
       });

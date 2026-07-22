@@ -32,7 +32,7 @@ const TABLE_MAP: Record<string, string> = {
   testimonials: 'testimonials',
   pillars: 'pillars',
   steps: 'methodology_steps',
-  audio: 'audio_capsules',
+  video_capsules: 'video_capsules',
   recommendations: 'video_recommendations',
 };
 
@@ -45,7 +45,7 @@ const ALLOWED_COLUMNS: Record<string, string[]> = {
   testimonials: ['text', 'author', 'role', 'rating', 'img'],
   pillars: ['title', 'desc', 'icon', 'badge', 'time', 'order_idx'],
   methodology_steps: ['ref', 'title', 'desc', 'order_idx'],
-  audio_capsules: ['title', 'duration', 'duration_sec', 'speaker', 'desc', 'bg_color', 'accent', 'badge', 'audio_url'],
+  video_capsules: ['title', 'duration', 'duration_sec', 'speaker', 'desc', 'bg_color', 'accent', 'badge', 'video_url'],
   video_recommendations: ['title', 'url', 'platform', 'desc', 'thumbnail'],
 };
 

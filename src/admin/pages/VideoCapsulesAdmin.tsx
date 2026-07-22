@@ -5,7 +5,7 @@ import { Modal } from '../components/Modal';
 import { FileUpload } from '../components/FileUpload';
 import { api } from '../lib/api';
 
-interface AudioCapsule {
+interface VideoCapsule {
   id: number;
   title: string;
   duration: string;
@@ -15,7 +15,7 @@ interface AudioCapsule {
   bg_color: string;
   accent: string;
   badge: string;
-  audio_url: string;
+  video_url: string;
 }
 
 const BG_OPTIONS = [
@@ -24,11 +24,11 @@ const BG_OPTIONS = [
   { label: 'Corail', bg: 'bg-[#fbebeb]', accent: 'text-coral' },
 ];
 
-const EMPTY: Omit<AudioCapsule, 'id'> = {
+const EMPTY: Omit<VideoCapsule, 'id'> = {
   title: '', duration: '04:00', duration_sec: 240,
   speaker: 'Lina NGUERELESSIO', desc: '',
   bg_color: 'bg-mint', accent: 'text-lead-green',
-  badge: '👶 Petite Enfance • 4 min', audio_url: '',
+  badge: '👶 Petite Enfance • 4 min', video_url: '',
 };
 
 const parseDurationSec = (mmss: string): number => {
@@ -37,11 +37,11 @@ const parseDurationSec = (mmss: string): number => {
   return 0;
 };
 
-const COLUMNS: Column<AudioCapsule>[] = [
+const COLUMNS: Column<VideoCapsule>[] = [
   { key: 'title', label: 'Titre', truncate: true },
   { key: 'badge', label: 'Badge', truncate: true },
   { key: 'duration', label: 'Durée' },
-  { key: 'audio_url', label: 'Fichier', render: v => v ? (
+  { key: 'video_url', label: 'Fichier', render: v => v ? (
     <span className="px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-bold rounded-full">✓ Chargé</span>
   ) : <span className="text-gray-300 text-xs">Aucun</span> },
 ];
@@ -52,28 +52,28 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   return <div><label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">{label}</label>{children}</div>;
 }
 
-export function AudioAdmin() {
-  const [data, setData] = useState<AudioCapsule[]>([]);
+export function VideoCapsulesAdmin() {
+  const [data, setData] = useState<VideoCapsule[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState<Partial<AudioCapsule>>(EMPTY);
+  const [form, setForm] = useState<Partial<VideoCapsule>>(EMPTY);
   const [editId, setEditId] = useState<number | null>(null);
 
   const load = () => {
     setLoading(true);
-    api.list<AudioCapsule>('audio').then(setData).finally(() => setLoading(false));
+    api.list<VideoCapsule>('video_capsules').then(setData).finally(() => setLoading(false));
   };
   useEffect(load, []);
 
   const openAdd = () => { setForm(EMPTY); setEditId(null); setModalOpen(true); };
-  const openEdit = (item: AudioCapsule) => { setForm(item); setEditId(item.id); setModalOpen(true); };
+  const openEdit = (item: VideoCapsule) => { setForm(item); setEditId(item.id); setModalOpen(true); };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      if (editId) await api.update<AudioCapsule>('audio', editId, form);
-      else await api.create<AudioCapsule>('audio', form);
+      if (editId) await api.update<VideoCapsule>('video_capsules', editId, form);
+      else await api.create<VideoCapsule>('video_capsules', form);
       setModalOpen(false);
       load();
     } catch (e: unknown) { alert('Erreur : ' + (e instanceof Error ? e.message : '')); }
@@ -81,12 +81,12 @@ export function AudioAdmin() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Supprimer cette capsule audio ?')) return;
-    await api.remove('audio', id);
+    if (!confirm('Supprimer cette capsule vidéo ?')) return;
+    await api.remove('video_capsules', id);
     load();
   };
 
-  const set = (f: keyof AudioCapsule, v: string | number) => setForm(p => ({ ...p, [f]: v }));
+  const set = (f: keyof VideoCapsule, v: string | number) => setForm(p => ({ ...p, [f]: v }));
 
   const handleDurationChange = (val: string) => {
     set('duration', val);
@@ -99,20 +99,20 @@ export function AudioAdmin() {
   };
 
   return (
-    <Layout title="Capsules Audio — Minutes Précieuses">
+    <Layout title="Capsules Vidéo — Minutes Précieuses">
       <DataTable data={data} columns={COLUMNS} onEdit={openEdit} onDelete={handleDelete}
         onAdd={openAdd} isLoading={loading} addLabel="Nouvelle capsule" />
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}
-        title={editId ? 'Modifier la capsule' : 'Nouvelle capsule audio'} onSubmit={handleSave} isLoading={saving}>
+        title={editId ? 'Modifier la capsule' : 'Nouvelle capsule vidéo'} onSubmit={handleSave} isLoading={saving}>
         <Field label="Titre"><input className={input} value={form.title ?? ''} onChange={e => set('title', e.target.value)} /></Field>
         <Field label="Description">
           <textarea className={`${input} h-24 resize-none`} value={form.desc ?? ''} onChange={e => set('desc', e.target.value)} />
         </Field>
-        <Field label="Fichier audio (MP3, WAV, M4A...)">
+        <Field label="Fichier vidéo (MP4, WEBM...)">
           <FileUpload
-            value={form.audio_url ?? ''} onChange={v => set('audio_url', v)}
-            accept="audio/*,.mp3,.wav,.ogg,.m4a"
-            label="un fichier audio" previewType="file"
+            value={form.video_url ?? ''} onChange={v => set('video_url', v)}
+            accept="video/*,.mp4,.webm"
+            label="un fichier vidéo" previewType="file"
           />
         </Field>
         <div className="grid grid-cols-2 gap-4">

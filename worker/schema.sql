@@ -114,8 +114,8 @@ CREATE TABLE IF NOT EXISTS video_recommendations (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Capsules audio (Minutes Précieuses)
-CREATE TABLE IF NOT EXISTS audio_capsules (
+-- Capsules vidéo (Minutes Précieuses)
+CREATE TABLE IF NOT EXISTS video_capsules (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   duration TEXT NOT NULL DEFAULT '04:00',
@@ -125,5 +125,6 @@ CREATE TABLE IF NOT EXISTS audio_capsules (
   bg_color TEXT NOT NULL DEFAULT 'bg-mint',
   accent TEXT NOT NULL DEFAULT 'text-lead-green',
   badge TEXT NOT NULL DEFAULT '👶 Petite Enfance • 4 min',
+  video_url TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
