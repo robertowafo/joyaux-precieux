@@ -1,39 +1,55 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Heart, Star, Sparkles, MessageCircle, ArrowLeft, ArrowRight, Compass } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { publicApi } from '../lib/publicApi';
+
+interface Testimonial {
+  text: string;
+  author: string;
+  role: string;
+  rating: number;
+  img: string;
+}
+
+const STATIC_TESTIMONIALS: Testimonial[] = [
+  {
+    text: "« Nous étions dans une impasse de communication. Grâce aux séances de guidance parentale et à l'écoute active, Lucas a pu mettre des mots sur son anxiété scolaire. Le dialogue est restauré. »",
+    author: "Sarah",
+    role: "Maman de Lucas (14 ans)",
+    rating: 5,
+    img: "/images/avatar_1_young_mother.jpg"
+  },
+  {
+    text: "« Trouver des activités psycho-éducatives qui éveillent l’intelligence émotionnelle de mon garçon tout en respectant notre foi chrétienne était un défi. Grâce aux séances de guidance de Lina, l'harmonie est de retour d'une façon extraordinaire ! »",
+    author: "Hortense M.",
+    role: "Maman de Noé (7 ans)",
+    rating: 5,
+    img: "/images/avatar_3_grandparent.jpg"
+  },
+  {
+    text: "« Les fiches de guidance et la routine d'écoute des Minutes Précieuses ont transformé l'ambiance à la maison. Les tensions ont baissé de moitié. On communique enfin avec vérité et avec grâce de l'écosystème familial. »",
+    author: "Jean-Eudes K.",
+    role: "Père de deux ados (13 et 15 ans)",
+    rating: 5,
+    img: "/images/avatar_2_father.jpg"
+  }
+];
 
 export function CallToAction() {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(STATIC_TESTIMONIALS);
+
+  useEffect(() => {
+    publicApi.testimonials().then(data => {
+      if (data.length > 0) setTestimonials(data as unknown as Testimonial[]);
+    });
+  }, []);
 
   const stats = [
     { title: "Familles Accompagnées", count: "25+", icon: "🤝" },
     { title: "Ans d'Écoute Active", count: "05", icon: "📚" },
     { title: "Satisfaction Parentale", count: "98%", icon: "💝" },
     { title: "Heures de Guidance", count: "240+", icon: "⏱️" }
-  ];
-
-  const testimonials = [
-    {
-      text: "« Nous étions dans une impasse de communication. Grâce aux séances de guidance parentale et à l'écoute active, Lucas a pu mettre des mots sur son anxiété scolaire. Le dialogue est restauré. »",
-      author: "Sarah",
-      role: "Maman de Lucas (14 ans)",
-      rating: 5,
-      img: "/images/avatar_1_young_mother.jpg"
-    },
-    {
-      text: "« Trouver des activités psycho-éducatives qui éveillent l’intelligence émotionnelle de mon garçon tout en respectant notre foi chrétienne était un défi. Grâce aux séances de guidance de Lina, l'harmonie est de retour d'une façon extraordinaire ! »",
-      author: "Hortense M.",
-      role: "Maman de Noé (7 ans)",
-      rating: 5,
-      img: "/images/avatar_3_grandparent.jpg"
-    },
-    {
-      text: "« Les fiches de guidance et la routine d'écoute des Minutes Précieuses ont transformé l'ambiance à la maison. Les tensions ont baissé de moitié. On communique enfin avec vérité et avec grâce de l'écosystème familial. »",
-      author: "Jean-Eudes K.",
-      role: "Père de deux ados (13 et 15 ans)",
-      rating: 5,
-      img: "/images/avatar_2_father.jpg"
-    }
   ];
 
   const nextTestimonial = () => {

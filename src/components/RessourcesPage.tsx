@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, Download, BookOpen, Volume2, Video, FileText, Sparkles, Heart, Check, X, ShieldAlert } from 'lucide-react';
 import { VideoCapsules } from './VideoCapsules';
 import { PracticalTools } from './PracticalTools';
 import { StorySpinner } from './StorySpinner';
+import { publicApi } from '../lib/publicApi';
 
 interface VideoFile {
   title: string;
@@ -37,7 +38,7 @@ export function RessourcesPage() {
     { id: 'livre', label: 'Livres Recommandés', icon: '📚' }
   ];
 
-  const videos: VideoFile[] = [
+  const STATIC_VIDEOS: VideoFile[] = [
     {
       title: "Gestion saine de l'autorité parentale : Comment poser un cadre clair",
       duration: "12:45",
@@ -76,7 +77,7 @@ export function RessourcesPage() {
     }
   ];
 
-  const books: Book[] = [
+  const STATIC_BOOKS: Book[] = [
     {
       title: "Parler pour que les enfants écoutent, écouter pour qu'ils parlent",
       author: "Adèle Faber & Elaine Mazlish",
@@ -102,6 +103,23 @@ export function RessourcesPage() {
       img: "/images/resource_2_emotion_journal.jpg"
     }
   ];
+
+  const [videos, setVideos] = useState<VideoFile[]>(STATIC_VIDEOS);
+  const [books, setBooks] = useState<Book[]>(STATIC_BOOKS);
+
+  useEffect(() => {
+    publicApi.videos().then(data => {
+      if (data.length > 0) setVideos(data as unknown as VideoFile[]);
+    });
+    publicApi.books().then(data => {
+      if (data.length > 0) {
+        setBooks((data as unknown as (Book & { benefits: unknown })[]).map(b => ({
+          ...b,
+          benefits: typeof b.benefits === 'string' ? JSON.parse(b.benefits) : b.benefits,
+        })) as Book[]);
+      }
+    });
+  }, []);
 
   const triggerDownload = (fileName: string) => {
     setDownloadSuccess(fileName);

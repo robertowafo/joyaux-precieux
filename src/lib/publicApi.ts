@@ -15,4 +15,6 @@ export const publicApi = {
   videos:   () => get<Record<string, unknown>>('videos'),
   books:    () => get<Record<string, unknown>>('books'),
   testimonials: () => get<Record<string, unknown>>('testimonials'),
+  pillars:  () => get<Record<string, unknown>>('pillars'),
+  steps:    () => get<Record<string, unknown>>('steps'),
 };

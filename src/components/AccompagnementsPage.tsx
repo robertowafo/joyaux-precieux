@@ -1,51 +1,84 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Heart, Shield, HelpCircle, ArrowRight, CheckCircle2, PhoneCall, Calendar, Users, Flame, Globe, MessageSquare, Compass, Smile } from 'lucide-react';
 import { DiagnosticFoyer } from './DiagnosticFoyer';
 import { HopscotchParentalite } from './HopscotchParentalite';
+import { publicApi } from '../lib/publicApi';
+
+interface Pillar {
+  title: string;
+  desc: string;
+  icon: string;
+  badge: string;
+  time: string;
+  order_idx?: number;
+}
+
+interface MethodologyStep {
+  ref: string;
+  title: string;
+  desc: string;
+  order_idx?: number;
+}
+
+const STATIC_PILLARS: Pillar[] = [
+  {
+    title: "Consultations en Psychologie du Développement de l'enfant",
+    desc: "Prise en charge spécialisée pour identifier les blocages cognitifs, les peurs infantiles, la gestion de la colère divine et les troubles légers du développement ou du sommeil.",
+    icon: "🌱",
+    badge: "Individuel • Enfants",
+    time: "45 min par séance"
+  },
+  {
+    title: "Guidance Parentale & Cellules de Médiation",
+    desc: "Sessions destinées aux parents pour redéfinir une autorité bienveillante et ferme, désamorcer les conflits, et harmoniser la foi avec les règles de vie de la maison.",
+    icon: "👪",
+    badge: "Famille & Couple",
+    time: "60 min par séance"
+  },
+  {
+    title: "Écoute Active CONFIDENTIELLE pour Adolescents",
+    desc: "Sas d'échanges sécurisés pour les préadolescents et adolescents confrontés au repli sur soi, à l'addiction aux écrans ou à de profondes interrogations identitaires.",
+    icon: "🤫",
+    badge: "Soutien Confidentiel",
+    time: "50 min par séance"
+  }
+];
+
+const STATIC_STEPS: MethodologyStep[] = [
+  {
+    ref: "01",
+    title: "Premier entretien d'orientation",
+    desc: "Nous faisons le point en profondeur sur l'historique du foyer de manière globale, sans jugement, pour poser les bases de la confiance."
+  },
+  {
+    ref: "02",
+    title: "Analyse psychologique fine",
+    desc: "Nous identifions les freins de communication à la lumière de la Psychologie du Développement positive et de l'équilibre spirituel."
+  },
+  {
+    ref: "03",
+    title: "Plan d'action restaurateur",
+    desc: "Mise en place de rituels de transition, fiches de routines, cadres réparateurs à tester et réévaluer ensemble en séances régulières."
+  }
+];
 
 export function AccompagnementsPage() {
-  const pillars = [
-    {
-      title: "Consultations en Psychologie du Développement de l'enfant",
-      desc: "Prise en charge spécialisée pour identifier les blocages cognitifs, les peurs infantiles, la gestion de la colère divine et les troubles légers du développement ou du sommeil.",
-      icon: "🌱",
-      badge: "Individuel • Enfants",
-      time: "45 min par séance"
-    },
-    {
-      title: "Guidance Parentale & Cellules de Médiation",
-      desc: "Sessions destinées aux parents pour redéfinir une autorité bienveillante et ferme, désamorcer les conflits, et harmoniser la foi avec les règles de vie de la maison.",
-      icon: "👪",
-      badge: "Famille & Couple",
-      time: "60 min par séance"
-    },
-    {
-      title: "Écoute Active CONFIDENTIELLE pour Adolescents",
-      desc: "Sas d'échanges sécurisés pour les préadolescents et adolescents confrontés au repli sur soi, à l'addiction aux écrans ou à de profondes interrogations identitaires.",
-      icon: "🤫",
-      badge: "Soutien Confidentiel",
-      time: "50 min par séance"
-    }
-  ];
+  const [pillars, setPillars] = useState<Pillar[]>(STATIC_PILLARS);
+  const [methodologySteps, setMethodologySteps] = useState<MethodologyStep[]>(STATIC_STEPS);
 
-  const methodologySteps = [
-    {
-      ref: "01",
-      title: "Premier entretien d'orientation",
-      desc: "Nous faisons le point en profondeur sur l'historique du foyer de manière globale, sans jugement, pour poser les bases de la confiance."
-    },
-    {
-      ref: "02",
-      title: "Analyse psychologique fine",
-      desc: "Nous identifions les freins de communication à la lumière de la Psychologie du Développement positive et de l'équilibre spirituel."
-    },
-    {
-      ref: "03",
-      title: "Plan d'action restaurateur",
-      desc: "Mise en place de rituels de transition, fiches de routines, cadres réparateurs à tester et réévaluer ensemble en séances régulières."
-    }
-  ];
+  useEffect(() => {
+    publicApi.pillars().then(data => {
+      if (data.length > 0) {
+        setPillars((data as unknown as Pillar[]).sort((a, b) => (a.order_idx ?? 0) - (b.order_idx ?? 0)));
+      }
+    });
+    publicApi.steps().then(data => {
+      if (data.length > 0) {
+        setMethodologySteps((data as unknown as MethodologyStep[]).sort((a, b) => (a.order_idx ?? 0) - (b.order_idx ?? 0)));
+      }
+    });
+  }, []);
 
   return (
     <div className="pt-24 min-h-screen bg-bg relative overflow-hidden">
