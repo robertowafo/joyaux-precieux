@@ -1,3 +1,12 @@
+-- Journal des tentatives sensibles (login, inscriptions) pour limiter les abus
+CREATE TABLE IF NOT EXISTS request_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ip TEXT NOT NULL,
+  action TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_request_log_ip_action ON request_log(ip, action, created_at);
+
 -- Articles de blog
 CREATE TABLE IF NOT EXISTS articles (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

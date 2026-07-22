@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Heart, Star, Sparkles, MessageCircle, ArrowLeft, ArrowRight, Compass } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { publicApi } from '../lib/publicApi';
 
 interface Testimonial {
@@ -39,11 +39,37 @@ export function CallToAction() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(STATIC_TESTIMONIALS);
 
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterError, setNewsletterError] = useState('');
+
   useEffect(() => {
     publicApi.testimonials().then(data => {
       if (data.length > 0) setTestimonials(data as unknown as Testimonial[]);
     });
   }, []);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.includes('@')) {
+      setNewsletterStatus('error');
+      setNewsletterError('Merci de saisir une adresse email valide.');
+      return;
+    }
+    setNewsletterStatus('loading');
+    try {
+      const result = await publicApi.subscribe(newsletterEmail, '', 'homepage');
+      if (result.error) {
+        setNewsletterStatus('error');
+        setNewsletterError(result.error);
+      } else {
+        setNewsletterStatus('success');
+      }
+    } catch {
+      setNewsletterStatus('error');
+      setNewsletterError('Erreur réseau, veuillez réessayer.');
+    }
+  };
 
   const stats = [
     { title: "Familles Accompagnées", count: "25+", icon: "🤝" },
@@ -78,12 +104,10 @@ export function CallToAction() {
             ❝
           </div>
           
-          <AnimatePresence mode="wait">
-            <motion.div
+          <motion.div
               key={activeIdx}
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.45, ease: "easeInOut" }}
               className="w-full flex flex-col lg:flex-row gap-16 items-center"
             >
@@ -117,8 +141,7 @@ export function CallToAction() {
                  </div>
               </div>
             </motion.div>
-          </AnimatePresence>
-          
+
           {/* Arrow navigation handles positioned clearly */}
           <div className="absolute bottom-8 right-8 lg:bottom-14 lg:right-14 flex gap-3 z-10">
              <button 
@@ -166,20 +189,30 @@ export function CallToAction() {
          </div>
 
          <div className="xl:w-1/2 w-full z-10">
-           <form onSubmit={(e) => e.preventDefault()} className="bg-white p-4 rounded-3xl md:rounded-[2rem] shadow-md border border-lead-green/5 flex flex-col sm:flex-row gap-4">
-              <input 
-                type="email" 
-                placeholder="Votre adresse email de parent" 
+           <form onSubmit={handleNewsletterSubmit} className="bg-white p-4 rounded-3xl md:rounded-[2rem] shadow-md border border-lead-green/5 flex flex-col sm:flex-row gap-4">
+              <input
+                type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="Votre adresse email de parent"
                 className="flex-grow px-6 py-4 rounded-2xl bg-bg border border-lead-green/5 focus:outline-none focus:border-highlight font-friendly text-sm text-lead-green"
                 required
+                disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
               />
-              <button 
-                type="submit" 
-                className="px-8 py-4 bg-[#e05a47] text-white text-xs font-bold tracking-widest uppercase rounded-2xl hover:bg-lead-green transition-colors font-friendly shrink-0"
+              <button
+                type="submit"
+                disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
+                className="px-8 py-4 bg-[#e05a47] text-white text-xs font-bold tracking-widest uppercase rounded-2xl hover:bg-lead-green transition-colors font-friendly shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                 S'abonner gratuitement
+                 {newsletterStatus === 'loading' ? 'Envoi...' : newsletterStatus === 'success' ? 'Inscrit(e) ✓' : "S'abonner gratuitement"}
               </button>
            </form>
+           {newsletterStatus === 'success' && (
+             <p className="mt-3 text-xs font-bold text-lead-green px-2">✓ Merci ! Votre inscription est bien enregistrée.</p>
+           )}
+           {newsletterStatus === 'error' && (
+             <p className="mt-3 text-xs font-bold text-coral px-2">{newsletterError}</p>
+           )}
          </div>
        </div>
     </section>

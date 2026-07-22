@@ -26,7 +26,8 @@ export function ArticlesPage() {
   
   // Newsletter Sign-up State
   const [email, setEmail] = useState('');
-  const [subStatus, setSubStatus] = useState<'idle' | 'success'>('idle');
+  const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [subError, setSubError] = useState('');
   const [premiumUnlocked, setPremiumUnlocked] = useState(false);
 
   // Micro-Interactive Quiz State for retention/parental self-audit
@@ -186,11 +187,26 @@ export function ArticlesPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim() && email.includes('@')) {
-      setSubStatus('success');
-      setPremiumUnlocked(true);
+    if (!email.trim() || !email.includes('@')) {
+      setSubStatus('error');
+      setSubError('Merci de saisir une adresse email valide.');
+      return;
+    }
+    setSubStatus('loading');
+    try {
+      const result = await publicApi.subscribe(email, '', 'articles-guide');
+      if (result.error) {
+        setSubStatus('error');
+        setSubError(result.error);
+      } else {
+        setSubStatus('success');
+        setPremiumUnlocked(true);
+      }
+    } catch {
+      setSubStatus('error');
+      setSubError('Erreur réseau, veuillez réessayer.');
     }
   };
 
@@ -527,7 +543,7 @@ export function ArticlesPage() {
             <div className="lg:col-span-5 w-full">
               <div id="downloadable-resource" className="bg-white text-lead-green p-8 rounded-[2.5rem] shadow-2xl border border-lead-green/5 relative">
                 
-                {subStatus === 'idle' ? (
+                {subStatus !== 'success' ? (
                   <form onSubmit={handleSubscribe} className="space-y-5">
                     <div className="text-center pb-3 border-b border-lead-green/5 mb-2">
                       <p className="text-[10px] font-bold text-coral uppercase tracking-widest font-friendly">Recevoir mon guide offert :</p>
@@ -536,22 +552,28 @@ export function ArticlesPage() {
 
                     <div className="space-y-2 text-left">
                       <label className="text-[10px] uppercase font-bold text-lead-green/60 tracking-wider block font-friendly">Votre adresse email :</label>
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         required
                         placeholder="exemple@monfoyer.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={subStatus === 'loading'}
                         className="w-full px-5 py-3.5 rounded-xl border border-lead-green/10 font-friendly text-xs focus:ring-1 focus:ring-coral focus:outline-none focus:border-coral font-medium"
                       />
                     </div>
 
                     <button
                       type="submit"
-                      className="w-full py-4 bg-[#e05a47] text-white font-friendly font-bold uppercase tracking-wider text-xs rounded-xl shadow-md hover:bg-lead-green cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                      disabled={subStatus === 'loading'}
+                      className="w-full py-4 bg-[#e05a47] text-white font-friendly font-bold uppercase tracking-wider text-xs rounded-xl shadow-md hover:bg-lead-green cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <Send size={13} /> S'abonner & Télécharger
+                      <Send size={13} /> {subStatus === 'loading' ? 'Envoi...' : "S'abonner & Télécharger"}
                     </button>
+
+                    {subStatus === 'error' && (
+                      <p className="text-[10px] text-center text-coral font-bold font-friendly">{subError}</p>
+                    )}
 
                     <p className="text-[9px] text-center text-lead-green/45 leading-normal font-friendly pt-2">
                       En soumettant votre email, vous acceptez de recevoir nos conseils d'accompagnement. Désabonnement en un seul clic à tout moment.

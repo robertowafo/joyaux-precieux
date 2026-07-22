@@ -9,6 +9,7 @@ const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'X-Content-Type-Options': 'nosniff',
 };
 
 function json(data: unknown, status = 200): Response {
@@ -21,6 +22,35 @@ function json(data: unknown, status = 200): Response {
 function requireAuth(request: Request, env: Env): boolean {
   const auth = request.headers.get('Authorization') ?? '';
   return auth.startsWith('Bearer ') && auth.slice(7) === env.ADMIN_SECRET;
+}
+
+function clientIp(request: Request): string {
+  return request.headers.get('CF-Connecting-IP') ?? 'unknown';
+}
+
+// True if `ip` has already logged >= maxAttempts for `action` within the window.
+async function isRateLimited(
+  env: Env,
+  ip: string,
+  action: string,
+  maxAttempts: number,
+  windowMinutes: number
+): Promise<boolean> {
+  // Use SQLite's own datetime() for the window boundary so the format always
+  // matches request_log.created_at's default (datetime('now')) — comparing a
+  // JS toISOString() string against it is not reliably ordered as text.
+  const row = await env.DB.prepare(
+    `SELECT COUNT(*) as count FROM request_log WHERE ip = ? AND action = ? AND created_at > datetime('now', '-${windowMinutes} minutes')`
+  ).bind(ip, action).first<{ count: number }>();
+
+  // Opportunistic cleanup so the table doesn't grow forever.
+  await env.DB.prepare(`DELETE FROM request_log WHERE created_at < datetime('now', '-1 day')`).run();
+
+  return (row?.count ?? 0) >= maxAttempts;
+}
+
+async function logAttempt(env: Env, ip: string, action: string): Promise<void> {
+  await env.DB.prepare(`INSERT INTO request_log (ip, action) VALUES (?, ?)`).bind(ip, action).run();
 }
 
 const TABLE_MAP: Record<string, string> = {
@@ -121,10 +151,15 @@ export default {
 
     // ── POST /api/auth ──────────────────────────────────────────────────────
     if (parts[1] === 'auth' && request.method === 'POST') {
+      const ip = clientIp(request);
+      if (await isRateLimited(env, ip, 'auth_fail', 5, 15)) {
+        return json({ error: 'Trop de tentatives. Réessayez dans quelques minutes.' }, 429);
+      }
       const body = (await request.json()) as { password: string };
       if (body.password === env.ADMIN_PASSWORD) {
         return json({ token: env.ADMIN_SECRET });
       }
+      await logAttempt(env, ip, 'auth_fail');
       return json({ error: 'Mot de passe incorrect' }, 401);
     }
 
@@ -186,6 +221,11 @@ export default {
     if (parts[1] === 'emails') {
       // Public: subscribe
       if (request.method === 'POST' && !parts[2]) {
+        const ip = clientIp(request);
+        if (await isRateLimited(env, ip, 'email_subscribe', 5, 60)) {
+          return json({ error: 'Trop de tentatives. Réessayez plus tard.' }, 429);
+        }
+        await logAttempt(env, ip, 'email_subscribe');
         const body = (await request.json()) as { email?: string; name?: string; source?: string };
         if (!body.email || !body.email.includes('@')) {
           return json({ error: 'Adresse email invalide' }, 400);
