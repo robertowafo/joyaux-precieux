@@ -132,18 +132,18 @@ export function VideoCapsules() {
           </div>
         </div>
 
-        {/* Right Integrated Video Player with Glassmorphic design */}
+        {/* Right Integrated Video Player with Glassmorphic design — portrait, phone-style */}
         <div className="w-full lg:w-1/2 flex justify-center items-center py-6">
-          <div className="w-full max-w-sm md:max-w-md bg-white border border-lead-green/5 p-8 rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col items-center">
+          <div className="w-full max-w-[300px] sm:max-w-xs bg-white border border-lead-green/5 p-6 rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col items-center">
 
              <div className="absolute top-0 left-0 w-32 h-32 bg-[#ff9d00]/5 rounded-full filter blur-3xl"></div>
 
-             <span className="text-[10px] font-bold tracking-widest text-[#e05a47] uppercase mb-8 font-friendly bg-[#faf2f0] px-3.5 py-1.5 rounded-full shadow-xs flex items-center gap-1.5">
+             <span className="text-[10px] font-bold tracking-widest text-[#e05a47] uppercase mb-6 font-friendly bg-[#faf2f0] px-3.5 py-1.5 rounded-full shadow-xs flex items-center gap-1.5">
                 <Sparkles size={11} className="text-[#ff9d00]" /> LECTEUR VIDÉO PRÉCIEUX
              </span>
 
-             {/* Video screen */}
-             <div className="relative w-full aspect-[4/3] mb-6 rounded-[2rem] overflow-hidden bg-[#121b16] shadow-2xl">
+             {/* Video screen — portrait 9:16, matching phone-recorded footage */}
+             <div className="relative w-full aspect-[9/16] mb-6 rounded-[2rem] overflow-hidden bg-[#121b16] shadow-2xl">
                 {current.video_url ? (
                   <video
                     key={current.id}

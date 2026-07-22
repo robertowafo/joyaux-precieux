@@ -1,14 +1,83 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { Heart, Sparkles, BookOpen, Clock, Users, Calendar, ArrowRight, Bell, Headphones, FileDown, Eye } from 'lucide-react';
+import { Heart, Sparkles, BookOpen, Clock, Users, Calendar, ArrowRight, Bell, Video, Film, FileDown, Eye } from 'lucide-react';
 import { gsap } from 'gsap';
+import { publicApi } from '../lib/publicApi';
 
 interface MethodologyProps {
   onNavigate?: (page: 'accueil' | 'articles' | 'accompagnements' | 'ressources' | 'plan') => void;
 }
 
+interface FeaturedResource {
+  icon: React.ReactNode;
+  type: string;
+  title: string;
+  duration: string;
+  desc: string;
+  actionText: string;
+}
+
+const STATIC_FEATURED: FeaturedResource[] = [
+  {
+    icon: <Video size={20} className="text-[#ff9d00]" />,
+    type: "🎥 Capsule Vidéo",
+    title: "Désamorcer une crise de colère en public",
+    duration: "4 min • Petite Enfance",
+    desc: "Des repères psycho-éducatifs immédiats pour calmer le débordement émotionnel sans utiliser la violence ou les cris devant les regards extérieurs.",
+    actionText: "Voir la capsule"
+  },
+  {
+    icon: <Film size={20} className="text-coral" />,
+    type: "🎬 Vidéos & Conférences",
+    title: "Gestion saine de l'autorité parentale",
+    duration: "12:45 • Parentalité",
+    desc: "Une mini-conférence psycho-éducative sur les neurosciences cognitives appliquées et la mise en place d'un protocole d'autorité positive au foyer.",
+    actionText: "Regarder la vidéo"
+  },
+  {
+    icon: <FileDown size={20} className="text-lead-green" />,
+    type: "📥 Fiche Pratique (PDF)",
+    title: "La Boussole des Émotions",
+    duration: "2 min • PDF Gratuit",
+    desc: "Une fiche psycho-éducative basée sur les Psaumes pour aider l'enfant à nommer sa colère, sa tristesse et sa joie devant Dieu.",
+    actionText: "Télécharger le PDF"
+  },
+  {
+    icon: <BookOpen size={20} className="text-[#a16207]" />,
+    type: "📖 Livre Recommandé",
+    title: "Parler pour que les enfants écoutent, écouter pour qu'ils parlent",
+    duration: "Adèle Faber & Elaine Mazlish",
+    desc: "Une oeuvre phare offrant des outils visuels et extrêmement pratiques pour surmonter l'opposition infantile sans heurts ni humiliations répétées.",
+    actionText: "Découvrir l'ouvrage"
+  }
+];
+
 export function Methodology({ onNavigate }: MethodologyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [featured, setFeatured] = useState<FeaturedResource[]>(STATIC_FEATURED);
+
+  useEffect(() => {
+    Promise.all([
+      publicApi.videoCapsules(),
+      publicApi.videos(),
+      publicApi.resources(),
+      publicApi.books(),
+    ]).then(([capsules, videos, resources, books]) => {
+      const next = [...STATIC_FEATURED];
+      const cap = capsules[0] as Record<string, unknown> | undefined;
+      if (cap) {
+        const category = String(cap.badge ?? '').replace(/^\S+\s/, '').split('•')[0].trim();
+        next[0] = { ...next[0], title: String(cap.title), duration: `${cap.duration} • ${category}`, desc: String(cap.desc) };
+      }
+      const vid = videos[0] as Record<string, unknown> | undefined;
+      if (vid) next[1] = { ...next[1], title: String(vid.title), duration: `${vid.duration} • ${vid.category}`, desc: String(vid.desc) };
+      const res = resources[0] as Record<string, unknown> | undefined;
+      if (res) next[2] = { ...next[2], title: String(res.title), duration: String(res.badge ?? 'PDF Gratuit'), desc: String(res.desc) };
+      const book = books[0] as Record<string, unknown> | undefined;
+      if (book) next[3] = { ...next[3], title: String(book.title), duration: `Par ${book.author}`, desc: String(book.desc) };
+      setFeatured(next);
+    });
+  }, []);
 
   const handleAnnouncementClick = (targetId: string) => {
     if (onNavigate) {
@@ -426,48 +495,20 @@ export function Methodology({ onNavigate }: MethodologyProps) {
           Ressources & Guides Utiles
         </h2>
         <p className="text-xs sm:text-sm text-lead-green/75 font-friendly font-semibold mt-4 leading-relaxed">
-          Accédez gratuitement à nos fiches pratiques de poche, à nos capsules audio d'écoute active et à nos guides d'épanouissement pour soutenir concrètement votre quotidien.
+          Accédez gratuitement à nos fiches pratiques de poche, à nos capsules vidéo d'écoute active et à nos guides d'épanouissement pour soutenir concrètement votre quotidien.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto font-friendly mb-16">
-        {[
-          {
-            id: 1,
-            icon: <Headphones size={20} className="text-[#ff9d00]" />,
-            type: "🎙️ Capsule Audio",
-            title: "L'autorité bienveillante au foyer",
-            duration: "3 min 30 • Écoute Libre",
-            desc: "Des repères cliniques et spirituels concrets pour poser des repères structurants avec amour et fermeté sans cris.",
-            actionText: "Écouter la capsule"
-          },
-          {
-            id: 2,
-            icon: <FileDown size={20} className="text-coral" />,
-            type: "📄 Fiche Pratique (PDF)",
-            title: "Le Journal des Émotions de Noé",
-            duration: "Support de dialogue gratuit",
-            desc: "Un outil coloré et ludique à imprimer pour aider l'enfant à apprivoiser et exprimer ses émotions au quotidien.",
-            actionText: "Télécharger le PDF"
-          },
-          {
-            id: 3,
-            icon: <BookOpen size={20} className="text-lead-green" />,
-            type: "📖 Lecture recommandée",
-            title: "Élever ses enfants dans la grâce",
-            duration: "Conseils thématiques de Lina",
-            desc: "Concilier la rigueur clinique des neurosciences cognitives avec l'amour inconditionnel et les valeurs divines.",
-            actionText: "Découvrir l'ouvrage"
-          }
-        ].map((resource) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto font-friendly mb-16">
+        {featured.map((resource, idx) => (
           <motion.div
-            key={resource.id}
+            key={idx}
             whileHover={{ y: -8, scale: 1.02 }}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: resource.id * 0.1 }}
-            className="bg-white border border-lead-green/10 hover:border-lead-green/30 p-8 rounded-[2.5rem] transition-all duration-300 flex flex-col justify-between shadow-xs hover:shadow-md cursor-pointer text-left"
+            transition={{ duration: 0.6, delay: idx * 0.1 }}
+            className="bg-white border border-lead-green/10 hover:border-lead-green/30 p-7 rounded-[2.5rem] transition-all duration-300 flex flex-col justify-between shadow-xs hover:shadow-md cursor-pointer text-left"
             onClick={() => onNavigate?.('ressources')}
           >
             <div>
@@ -476,13 +517,13 @@ export function Methodology({ onNavigate }: MethodologyProps) {
                 <span className="text-[10px] font-extrabold text-lead-green uppercase tracking-wider">{resource.type}</span>
               </div>
 
-              <h4 className="font-friendly font-bold text-lead-green text-base sm:text-lg mb-2 leading-snug group-hover:text-coral transition-colors">
+              <h4 className="font-friendly font-bold text-lead-green text-base mb-2 leading-snug group-hover:text-coral transition-colors line-clamp-2 min-h-[2.6em]">
                 {resource.title}
               </h4>
-              
+
               <span className="text-[10px] font-bold text-[#ff9d00] block mb-4">{resource.duration}</span>
 
-              <p className="text-xs sm:text-sm text-lead-green/70 leading-relaxed">
+              <p className="text-xs text-lead-green/70 leading-relaxed line-clamp-3">
                 {resource.desc}
               </p>
             </div>
