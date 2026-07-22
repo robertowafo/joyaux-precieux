@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_URL || 'https://joyaux-precieux-api.robertomopouong1.workers.dev/api';
+const BASE = import.meta.env.VITE_API_URL || 'https://joyaux-precieux-api.impacttech237.workers.dev/api';
 
 async function get<T>(resource: string): Promise<T[]> {
   const res = await fetch(`${BASE}/${resource}?limit=50`);

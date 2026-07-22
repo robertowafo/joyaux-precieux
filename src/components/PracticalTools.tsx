@@ -18,7 +18,7 @@ interface PdfTool {
 const STATIC_TOOLS: PdfTool[] = [
   { id: 1, title: "La Boussole des Émotions", desc: "Une fiche psycho-éducative basée sur les Psaumes pour aider l'enfant à nommer sa colère, sa tristesse et sa joie devant Dieu.", type: "📥 KIT PDF À IMPRIMER", color: "bg-mint border-lead-green/10", accent: "text-lead-green", badge: "🌱 Psychologie de l'enfant", img: "/images/resource_2_emotion_journal.jpg", file_url: "" },
   { id: 2, title: "Planning de Vacances Utiles", desc: "7 jours de routines équilibrées alliant sport, repos, ateliers de créativité et rendez-vous spirituels bénis.", type: "📥 GUIDE PRATIQUE", color: "bg-yellow-bg border-highlight/10", accent: "text-[#ff9d00]", badge: "🗓️ Routine & Camps", img: "/images/resource_1_guide_pdf.jpg", file_url: "" },
-  { id: 3, title: "Le Code de Grâce & Vérité", desc: "Un protocole en 3 étapes clefs pour résoudre les disputes entre frères et sœurs selon les enseignements d'Éphésiens 4.", type: "📥 FICHE DE DISCIPLINE", color: "bg-[#fbebeb] border-coral/10", accent: "text-coral", badge: "🙏 Conseils Bibliques", img: "/images/resource_3_discipline_cards.jpg", file_url: "" },
+  { id: 3, title: "Le Code de Grâce & Vérité", desc: "Un protocole en 3 étapes clefs pour résoudre les disputes entre frères et sœurs selon les enseignements d'Éphésiens 4.", type: "📥 FICHE DE DISCIPLINE", color: "bg-[#fbebeb] border-coral/10", accent: "text-coral", badge: "🙏 Conseils Bibliques", img: "/images/resource_3_emotion_wheel.jpg", file_url: "" },
 ];
 
 export function PracticalTools() {

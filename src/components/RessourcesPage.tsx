@@ -70,7 +70,7 @@ export function RessourcesPage() {
       duration: "15:40",
       desc: "Une étude psycho-spirituelle montrant comment restaurer le lien affectif après une crise ou une colère familiale.",
       category: "Spiritualité",
-      img: "/images/resource_3_discipline_cards.jpg",
+      img: "/images/resource_3_emotion_wheel.jpg",
       url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       speaker: "Lina NGUERELESSIO"
     }

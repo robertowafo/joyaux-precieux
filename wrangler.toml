@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "joyaux-precieux"
-database_id = "6fcdbfbd-898d-450e-a747-61a5c8c4816b"
+database_id = "7888d6a4-377d-41cc-9759-4868725a6fd6"
 
 [[r2_buckets]]
 binding = "MEDIA"
