@@ -20,27 +20,27 @@ export function SEOHandler({ currentPage }: SEOHandlerProps) {
       case 'articles':
         title = "La Tribune Littéraire | Articles et Décryptages Cliniques | Joyaux Précieux";
         description = "Fiches de psychologie de l'enfant, routines sécurisantes de retour à la maison, gestion de l'isolement chez l'adolescent et éducation bienveillante.";
-        canonicalSuffix = "#articles";
+        canonicalSuffix = "articles";
         break;
       case 'accompagnements':
         title = "Accompagnement Clinique & Guidance Familiale | Joyaux Précieux";
         description = "Prestations de médiation des foyers, écoute active, et plans psycho-éducatifs sur-mesure pour pacifier la relation parents-enfants.";
-        canonicalSuffix = "#accompagnements";
+        canonicalSuffix = "accompagnements";
         break;
       case 'ressources':
         title = "Ressources Psycho-éducatives & Boîte à Outils | Joyaux Précieux";
         description = "Fiches cliniques téléchargeables gratuites, capsules vidéo de guidance pour parents pressés, enregistrements vidéo et littérature jeunesse.";
-        canonicalSuffix = "#ressources";
+        canonicalSuffix = "ressources";
         break;
       case 'plan':
         title = "Le Standard Divin | Principes Cliniques & Spirituels | Joyaux Précieux";
         description = "Découvrez notre boussole éducative unissant les neurosciences affectives de l'enfant aux repères spirituels sains de la grâce chrétienne.";
-        canonicalSuffix = "#plan";
+        canonicalSuffix = "standard-divin";
         break;
       case 'rdv':
         title = "Prendre Rendez-vous | Consultation de Guidance Familiale | Lina N.";
         description = "Prenez rendez-vous en ligne pour une première séance de contact gratuite de 15 minutes. Échangeons en toute bienveillance.";
-        canonicalSuffix = "#rdv";
+        canonicalSuffix = "rendez-vous";
         break;
     }
 
@@ -69,7 +69,9 @@ export function SEOHandler({ currentPage }: SEOHandlerProps) {
       canonicalEl.setAttribute('rel', 'canonical');
       document.head.appendChild(canonicalEl);
     }
-    const currentBaseUrl = "https://joyauxprecieux.fr";
+    // Use the live origin so the canonical always matches where the site is served
+    // (works on the pages.dev URL today and on a future custom domain automatically).
+    const currentBaseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://joyaux-precieux-7wr.pages.dev';
     canonicalEl.setAttribute('href', `${currentBaseUrl}/${canonicalSuffix}`);
 
     // 2. PHASE 2: JSON-LD SCHEMAS GENERATION (EEAT & RICH SNIPPETS)
