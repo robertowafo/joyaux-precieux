@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, Download, BookOpen, Volume2, Video, FileText, Sparkles, Heart, Check, X, ShieldAlert } from 'lucide-react';
+import { Play, BookOpen, Video, FileText, X } from 'lucide-react';
 import { VideoCapsules } from './VideoCapsules';
 import { PracticalTools } from './PracticalTools';
 import { StorySpinner } from './StorySpinner';
@@ -27,7 +27,6 @@ interface Book {
 
 export function RessourcesPage() {
   const [activeCategory, setActiveCategory] = useState<'tous' | 'audio' | 'video' | 'pdf' | 'livre'>('tous');
-  const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<VideoFile | null>(null);
 
   const categories = [
@@ -121,13 +120,6 @@ export function RessourcesPage() {
     });
   }, []);
 
-  const triggerDownload = (fileName: string) => {
-    setDownloadSuccess(fileName);
-    setTimeout(() => {
-      setDownloadSuccess(null);
-    }, 4000);
-  };
-
   return (
     <div className="pt-24 min-h-screen bg-bg relative">
       {/* Decors Blur Layer */}
@@ -201,23 +193,6 @@ export function RessourcesPage() {
           <StorySpinner />
         </div>
       )}
-
-      {/* PDF download success floating banner */}
-      <AnimatePresence>
-        {downloadSuccess && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-99 bg-lead-green border border-white/20 px-6 py-4 rounded-full text-white font-friendly font-bold text-xs sm:text-sm flex items-center gap-3.5 shadow-2xl"
-          >
-            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">
-              <Check size={12} className="text-white" />
-            </div>
-            <span>Fiche téléchargée avec succès : <strong>{downloadSuccess}</strong></span>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <section className="px-6 lg:px-12 pb-32 max-w-[90rem] mx-auto space-y-24">
         
@@ -412,42 +387,51 @@ export function RessourcesPage() {
               className="bg-[#1a2520] border-2 border-lead-green/30 w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-2xl relative"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Fake Video Player Screen */}
+              {/* Video preview: real link out if a URL exists, honest "not yet available" state otherwise */}
               <div className="aspect-[16/9] bg-black flex items-center justify-center relative w-full overflow-hidden">
-                <img 
-                  src={selectedVideo.img} 
-                  alt={selectedVideo.title} 
+                <img
+                  src={selectedVideo.img}
+                  alt={selectedVideo.title}
                   className="absolute inset-0 w-full h-full object-cover opacity-35"
                   referrerPolicy="no-referrer"
                 />
-                
-                {/* Streaming visualizer lines to bring UI to life */}
+
                 <div className="absolute inset-x-0 top-0 p-6 bg-gradient-to-b from-black/80 to-transparent text-white flex justify-between items-center">
                   <span className="text-xs font-bold uppercase tracking-widest text-[#ff9d00] flex items-center gap-1">
-                    <Sparkles size={11} className="animate-spin" /> Lecture en cours
+                    <Video size={12} /> {selectedVideo.category}
                   </span>
-                  <button 
+                  <button
                     onClick={() => setSelectedVideo(null)}
                     className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
                   >
                     <X size={16} />
                   </button>
                 </div>
-                
+
                 <div className="text-center z-10 p-6">
-                  <div className="w-16 h-16 rounded-full bg-coral/90 border border-white/20 text-white flex items-center justify-center mx-auto shadow-2xl animate-pulse">
-                    <Play size={20} className="fill-current text-white ml-1" />
-                  </div>
-                  <p className="text-xs font-mono font-bold text-white/50 bg-black/50 px-3 py-1 rounded-full inline-block mt-4 border border-white/5">
-                    Simulation de flux vidéo • Lina NGUERELESSIO Guidance
-                  </p>
+                  {selectedVideo.url ? (
+                    <a
+                      href={selectedVideo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-16 h-16 rounded-full bg-coral/90 border border-white/20 text-white flex items-center justify-center mx-auto shadow-2xl hover:bg-[#ff9d00] hover:scale-105 transition-all cursor-pointer"
+                    >
+                      <Play size={20} className="fill-current text-white ml-1" />
+                    </a>
+                  ) : (
+                    <>
+                      <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center mx-auto">
+                        <Video size={20} />
+                      </div>
+                      <p className="text-xs font-mono font-bold text-white/50 bg-black/50 px-3 py-1 rounded-full inline-block mt-4 border border-white/5">
+                        Vidéo bientôt disponible en ligne
+                      </p>
+                    </>
+                  )}
                 </div>
-                
+
                 <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white/80 font-mono text-xs flex justify-between items-center">
-                  <span>00:00 / {selectedVideo.duration}</span>
-                  <div className="w-1/2 h-1 bg-white/20 rounded-full relative overflow-hidden">
-                    <div className="absolute left-0 top-0 bottom-0 w-1/10 bg-coral"></div>
-                  </div>
+                  <span>{selectedVideo.duration}</span>
                 </div>
               </div>
 
@@ -461,15 +445,25 @@ export function RessourcesPage() {
                 </p>
                 <div className="flex justify-between items-center pt-5 border-t border-white/10 text-xs text-white/60">
                   <span>Présenté par {selectedVideo.speaker}</span>
-                  <button
-                    onClick={() => {
-                      triggerDownload(selectedVideo.title + ".mp4");
-                      setSelectedVideo(null);
-                    }}
-                    className="flex items-center gap-1.5 px-4.5 py-2.5 bg-white text-lead-green font-bold uppercase rounded-full hover:bg-[#ff9d00] hover:text-white transition-colors cursor-pointer"
-                  >
-                    <Download size={12} /> Télécharger l'enregistrement
-                  </button>
+                  {selectedVideo.url ? (
+                    <a
+                      href={selectedVideo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-4.5 py-2.5 bg-white text-lead-green font-bold uppercase rounded-full hover:bg-[#ff9d00] hover:text-white transition-colors cursor-pointer"
+                    >
+                      <Play size={12} /> Regarder la vidéo ↗
+                    </a>
+                  ) : (
+                    <a
+                      href={`https://wa.me/237621479061?text=${encodeURIComponent(`Bonjour, je souhaite être averti(e) de la sortie en ligne de la vidéo « ${selectedVideo.title} ».`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-4.5 py-2.5 bg-white/10 border border-white/20 text-white font-bold uppercase rounded-full hover:bg-white hover:text-lead-green transition-colors cursor-pointer text-[11px]"
+                    >
+                      Être averti(e) par WhatsApp
+                    </a>
+                  )}
                 </div>
               </div>
 

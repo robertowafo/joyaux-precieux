@@ -31,7 +31,6 @@ export function DiagnosticFoyer() {
       "Valorisez les efforts émotionnels plutôt que les résultats scolaires."
     ];
     let resourceTitle = "Kit Psycho-Éducatif des Joyaux";
-    let downloadLink = "#";
 
     if (ageRange === 'conception-naissance') {
       tips = [
@@ -98,6 +97,12 @@ export function DiagnosticFoyer() {
   };
 
   const result = getResult();
+
+  const getDiagnosticWhatsAppLink = () => {
+    const tipsText = result.tips.map((tip, i) => `${i + 1}. ${tip}`).join('\n');
+    const text = `Bonjour Madame Lina, je viens de faire le diagnostic interactif sur votre site.\n\n🌟 *${result.title}*\n${tipsText}\n\nJ'aimerais recevoir la fiche complète "${result.resourceTitle}" et en discuter avec vous.`;
+    return `https://wa.me/237621479061?text=${encodeURIComponent(text)}`;
+  };
 
   return (
     <section id="diagnostic" className="py-24 md:py-36 px-6 lg:px-12 max-w-[90rem] mx-auto bg-yellow-bg/30 border-t border-lead-green/10 rounded-[3rem] my-12">
@@ -337,12 +342,14 @@ export function DiagnosticFoyer() {
                         <span className="text-[9px] font-bold text-[#ff9d00] tracking-widest uppercase block mb-1">Ressource Recommandée :</span>
                         <span className="font-friendly text-xs font-bold text-lead-green">{result.resourceTitle}</span>
                      </div>
-                     <button
-                        onClick={() => alert("Votre téléchargement de ressource commencera dans un instant. (Simulation)")}
+                     <a
+                        href={getDiagnosticWhatsAppLink()}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="px-4 py-2.5 bg-[#e05a47] text-white text-[10px] font-bold uppercase tracking-wider rounded-xl hover:bg-lead-green transition-all flex items-center gap-1.5 shadow-sm cursor-pointer font-sans"
                      >
-                        <Download size={11} /> Télécharger
-                     </button>
+                        <Download size={11} /> Recevoir par WhatsApp
+                     </a>
                   </div>
                 </div>
 

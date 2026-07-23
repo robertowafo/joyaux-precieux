@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Download, Flame } from 'lucide-react';
+import { Download, Flame, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
 import { publicApi } from '../lib/publicApi';
 
@@ -46,10 +46,6 @@ export function PracticalTools() {
              Passez de la théorie de l'éducation à des moments bénis au quotidien grâce à nos guides et kits illustrés gratuits.
           </p>
         </div>
-        
-        <button className="px-8 py-4.5 bg-lead-green text-white text-[11px] font-bold tracking-[0.15em] hover:bg-highlight uppercase transition-colors rounded-full font-friendly select-none shadow-md">
-           Voir tous les outils
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -95,8 +91,11 @@ export function PracticalTools() {
                      <Download size={16} />
                    </a>
                  ) : (
-                   <div className="w-10 h-10 rounded-full bg-lead-green/30 text-white flex items-center justify-center shadow-sm">
-                     <Download size={16} />
+                   <div
+                     title="Bientôt disponible"
+                     className="w-10 h-10 rounded-full bg-lead-green/20 text-lead-green/50 flex items-center justify-center shadow-sm cursor-not-allowed"
+                   >
+                     <Clock size={16} />
                    </div>
                  )}
               </div>

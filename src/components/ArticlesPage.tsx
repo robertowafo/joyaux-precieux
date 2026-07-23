@@ -591,7 +591,7 @@ export function ArticlesPage() {
                     
                     <h4 className="text-xl font-bold text-lead-green mb-2">Inscription Validée !</h4>
                     <p className="text-xs text-lead-green/70 leading-relaxed font-semibold mb-6">
-                      Bienvenue au sein du cercle des parents prévoyants. Votre guide PDF premium est activé ci-dessous.
+                      Bienvenue au sein du cercle des parents prévoyants. Votre email est bien enregistré — Lina vous envoie personnellement votre guide dans les prochains jours.
                     </p>
 
                     <div className="p-4 bg-mint/55 rounded-2xl border border-lead-green/10 mb-6 text-left flex items-start gap-3">
@@ -603,14 +603,12 @@ export function ArticlesPage() {
                     </div>
 
                     <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        alert("Le Guide Psycho-Éducatif offert 'Guide_Dialogue_Restaurateur.pdf' (1.4 Mo) a été généré et s'est téléchargé avec succès ! Merci pour votre confiance envers Lina NGUERELESSIO.");
-                      }}
+                      href={`https://wa.me/237621479061?text=${encodeURIComponent(`Bonjour Madame Lina, je viens de m'inscrire sur le site avec l'email ${email} — pouvez-vous m'envoyer le guide "Guide_Dialogue_Restaurateur.pdf" ? Merci !`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-full py-3.5 bg-lead-green hover:bg-[#ff9d00] text-white rounded-xl text-xs font-bold uppercase tracking-widest block transition-colors text-center shadow"
                     >
-                      Télécharger le guide PDF 📥
+                      Recevoir le guide plus vite par WhatsApp 📲
                     </a>
                   </motion.div>
                 )}
