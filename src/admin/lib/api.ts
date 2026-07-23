@@ -26,6 +26,9 @@ export const api = {
 
   stats: () => req<Record<string, number>>('/stats'),
 
+  linkPreview: (url: string) =>
+    req<{ title: string; desc: string; thumbnail: string; platform: string; error?: string }>(`/link-preview?url=${encodeURIComponent(url)}`),
+
   list: <T>(resource: string) => req<T[]>(`/${resource}`),
   get: <T>(resource: string, id: number) => req<T>(`/${resource}/${id}`),
   create: <T>(resource: string, data: Partial<T>) =>

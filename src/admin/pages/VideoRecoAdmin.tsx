@@ -60,6 +60,29 @@ export function VideoRecoAdmin() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Partial<VideoReco>>(EMPTY);
   const [editId, setEditId] = useState<number | null>(null);
+  const [fetching, setFetching] = useState(false);
+  const [fetchMsg, setFetchMsg] = useState('');
+
+  const autoFill = async () => {
+    if (!form.url) { setFetchMsg('Collez d\'abord le lien de la vidéo.'); return; }
+    setFetching(true);
+    setFetchMsg('');
+    try {
+      const p = await api.linkPreview(form.url);
+      setForm(prev => ({
+        ...prev,
+        title: p.title || prev.title,
+        desc: p.desc || prev.desc,
+        thumbnail: p.thumbnail || prev.thumbnail,
+        platform: p.platform || prev.platform,
+      }));
+      setFetchMsg('✓ Informations récupérées automatiquement.');
+    } catch (e: unknown) {
+      setFetchMsg('⚠ ' + (e instanceof Error ? e.message : 'Récupération impossible.'));
+    } finally {
+      setFetching(false);
+    }
+  };
 
   const load = () => {
     setLoading(true);
@@ -67,8 +90,8 @@ export function VideoRecoAdmin() {
   };
   useEffect(load, []);
 
-  const openAdd = () => { setForm(EMPTY); setEditId(null); setModalOpen(true); };
-  const openEdit = (item: VideoReco) => { setForm(item); setEditId(item.id); setModalOpen(true); };
+  const openAdd = () => { setForm(EMPTY); setEditId(null); setFetchMsg(''); setModalOpen(true); };
+  const openEdit = (item: VideoReco) => { setForm(item); setEditId(item.id); setFetchMsg(''); setModalOpen(true); };
 
   const handleSave = async () => {
     setSaving(true);
@@ -115,10 +138,6 @@ export function VideoRecoAdmin() {
         onSubmit={handleSave}
         isLoading={saving}
       >
-        <Field label="Titre de la vidéo">
-          <input className={input} value={form.title ?? ''} onChange={e => set('title', e.target.value)}
-            placeholder="Nom de la vidéo ou de la conférence" />
-        </Field>
         <Field label="Vidéo (lien ou fichier) *">
           <LinkOrUpload
             value={form.url ?? ''}
@@ -127,6 +146,19 @@ export function VideoRecoAdmin() {
             label="une vidéo"
             linkPlaceholder="https://www.youtube.com/watch?v=..."
           />
+          <button
+            type="button"
+            onClick={autoFill}
+            disabled={fetching}
+            className="mt-2 flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#1f4a38] text-white text-xs font-bold hover:bg-[#ff9d00] transition-colors disabled:opacity-50 cursor-pointer"
+          >
+            {fetching ? '⏳ Récupération...' : '✨ Récupérer titre, description et miniature'}
+          </button>
+          {fetchMsg && <p className="mt-1.5 text-[11px] font-semibold text-gray-500">{fetchMsg}</p>}
+        </Field>
+        <Field label="Titre de la vidéo">
+          <input className={input} value={form.title ?? ''} onChange={e => set('title', e.target.value)}
+            placeholder="Rempli automatiquement, ou saisissez-le" />
         </Field>
         <Field label="Plateforme">
           <select className={input} value={form.platform ?? 'YouTube'} onChange={e => set('platform', e.target.value)}>

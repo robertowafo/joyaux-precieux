@@ -246,95 +246,78 @@ export function AccompagnementsPage() {
         </div>
       </section>
 
-      {/* 6 Axes d'Action section (distributed from the main PDF to keep page cognitive load light) */}
-      <section className="px-6 lg:px-12 pb-24 max-w-7xl mx-auto text-center font-friendly relative">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-14 max-w-2xl mx-auto"
+      {/* 6 Axes d'Intervention — redesigned as a vibrant, personalised showcase */}
+      <section className="px-6 lg:px-12 py-20 max-w-7xl mx-auto font-friendly relative overflow-hidden">
+        {/* Decorative floating flowers */}
+        <motion.span className="absolute top-10 left-[3%] text-4xl hidden md:block select-none pointer-events-none -z-0"
+          animate={{ rotate: [0, 15, -10, 0], y: [0, -12, 0] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}>🌸</motion.span>
+        <motion.span className="absolute bottom-16 right-[4%] text-3xl hidden md:block select-none pointer-events-none -z-0"
+          animate={{ rotate: [0, -360] }} transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}>🌼</motion.span>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+          className="text-center mb-16 max-w-2xl mx-auto relative"
         >
-          <span className="text-[9px] font-bold text-coral uppercase tracking-widest block mb-1">
-            Standard d'Action Joyaux Précieux
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-coral/10 text-coral text-[10px] font-bold uppercase tracking-widest mb-4 border border-coral/10">
+            <Sparkles size={11} className="animate-pulse" /> Standard d'Action Joyaux Précieux
           </span>
-          <h2 className="text-2xl sm:text-3xl font-bold text-lead-green">
-            Les 6 Axes d’Intervention de la Plateforme
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-lead-green tracking-tight leading-tight">
+            6 façons de <span className="text-[#ff9d00] underline decoration-coral decoration-wavy">restaurer</span> votre foyer
           </h2>
-          <p className="text-xs sm:text-sm text-lead-green/75 mt-2 font-semibold">
-            Un accompagnement multidimensionnel, clinique et spirituel, conçu pour restaurer l'harmonie des foyers en profondeur.
+          <p className="text-sm text-lead-green/75 mt-4 font-semibold">
+            Un accompagnement multidimensionnel — clinique, humain et spirituel — pensé pour prendre soin de chaque membre de la famille, à chaque étape.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
           {[
-            {
-              title: "Éducation & Guidance",
-              desc: "Former les parents et futurs parents à l'éducation bienveillante via des ateliers, conférences et diagnostics cliniques.",
-              icon: <Users size={20} className="text-coral" />,
-              badge: "Ateliers & Conférences"
-            },
-            {
-              title: "Écoute & Soutien Clinique",
-              desc: "Espaces d'écoute individuels et confidentiels pour apaiser les blessures émotionnelles et restaurer le dialogue.",
-              icon: <Heart size={20} className="text-coral" />,
-              badge: "Soutien Confidentiel"
-            },
-            {
-              title: "Épanouissement des Jeunes",
-              desc: "Mentorat personnalisé et programmes de vie pratique pour aider les adolescents à se structurer et à s'épanouir.",
-              icon: <Smile size={20} className="text-[#ff9d00]" />,
-              badge: "Clubs & Mentorat"
-            },
-            {
-              title: "Renforcement Spirituel",
-              desc: "Retraites de couples, cercles de prière familiaux et enseignements centrés sur le Standard Divin du foyer.",
-              icon: <Flame size={20} className="text-[#ff9d00]" />,
-              badge: "Foi & Valeurs"
-            },
-            {
-              title: "Partenariats Éducatifs",
-              desc: "Collaboration étroite avec les crèches, écoles et structures chrétiennes pour harmoniser la chaîne éducative.",
-              icon: <Globe size={20} className="text-lead-green" />,
-              badge: "Impact Réseau"
-            },
-            {
-              title: "Communication & Médias",
-              desc: "Diffusion de messages inspirants, fiches rituelles de routines et podcasts de sensibilisation sur la famille.",
-              icon: <MessageSquare size={20} className="text-lead-green" />,
-              badge: "Sensibilisation"
-            }
-          ].map((axe, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, ease: "easeOut", delay: idx * 0.1 }}
-              whileHover={{ y: -6, scale: 1.01 }}
-              className="bg-white p-6 rounded-[2rem] border border-lead-green/10 shadow-3xs flex flex-col justify-between h-52 hover:shadow-md transition-all duration-300"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-bg border border-lead-green/5 flex items-center justify-center">
-                    {axe.icon}
+            { title: "Éducation & Guidance", desc: "Former les parents et futurs parents à l'éducation bienveillante via des ateliers, conférences et diagnostics cliniques.", icon: <Users size={22} />, badge: "Ateliers & Conférences", emoji: "🎓", theme: "mint" },
+            { title: "Écoute & Soutien Clinique", desc: "Des espaces d'écoute individuels et confidentiels pour apaiser les blessures émotionnelles et restaurer le dialogue.", icon: <Heart size={22} />, badge: "Soutien Confidentiel", emoji: "🤍", theme: "coral" },
+            { title: "Épanouissement des Jeunes", desc: "Mentorat personnalisé et programmes de vie pratique pour aider les adolescents à se structurer et à s'épanouir.", icon: <Smile size={22} />, badge: "Clubs & Mentorat", emoji: "🌟", theme: "yellow" },
+            { title: "Renforcement Spirituel", desc: "Retraites de couples, cercles de prière familiaux et enseignements centrés sur le Standard Divin du foyer.", icon: <Flame size={22} />, badge: "Foi & Valeurs", emoji: "🕊️", theme: "coral" },
+            { title: "Partenariats Éducatifs", desc: "Collaboration étroite avec les crèches, écoles et structures chrétiennes pour harmoniser la chaîne éducative.", icon: <Globe size={22} />, badge: "Impact Réseau", emoji: "🤝", theme: "mint" },
+            { title: "Communication & Médias", desc: "Diffusion de messages inspirants, fiches rituelles de routines et podcasts de sensibilisation sur la famille.", icon: <MessageSquare size={22} />, badge: "Sensibilisation", emoji: "📣", theme: "yellow" },
+          ].map((axe, idx) => {
+            const themes: Record<string, { grad: string; ring: string; icon: string; num: string }> = {
+              mint: { grad: 'from-mint/60 to-white', ring: 'border-lead-green/15', icon: 'bg-lead-green text-white', num: 'text-lead-green/10' },
+              coral: { grad: 'from-[#fbebeb] to-white', ring: 'border-coral/15', icon: 'bg-coral text-white', num: 'text-coral/10' },
+              yellow: { grad: 'from-yellow-bg/70 to-white', ring: 'border-[#ff9d00]/20', icon: 'bg-[#ff9d00] text-white', num: 'text-[#ff9d00]/15' },
+            };
+            const t = themes[axe.theme];
+            return (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.55, ease: "easeOut", delay: idx * 0.08 }}
+                whileHover={{ y: -8 }}
+                className={`group relative bg-gradient-to-br ${t.grad} p-7 rounded-[2.5rem] border ${t.ring} shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden`}
+              >
+                {/* Giant watermark number */}
+                <span className={`absolute -bottom-4 -right-1 text-[7rem] font-black leading-none ${t.num} select-none pointer-events-none`}>
+                  {idx + 1}
+                </span>
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={`w-14 h-14 rounded-2xl ${t.icon} flex items-center justify-center shadow-md group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300`}>
+                      {axe.icon}
+                    </div>
+                    <span className="text-2xl select-none opacity-80 group-hover:scale-125 transition-transform">{axe.emoji}</span>
                   </div>
-                  <span className="text-[9px] font-bold text-lead-green/50 uppercase tracking-wider font-mono">
-                    Axe 0{idx + 1}
+
+                  <span className="text-[9px] font-bold text-lead-green/40 uppercase tracking-[0.2em] font-mono block mb-1.5">Axe 0{idx + 1}</span>
+                  <h3 className="font-extrabold text-lead-green text-lg mb-2 leading-tight">{axe.title}</h3>
+                  <p className="text-xs text-lead-green/75 leading-relaxed font-semibold mb-5">{axe.desc}</p>
+
+                  <span className="inline-block text-[9px] font-bold text-coral uppercase tracking-widest bg-white/70 px-3 py-1.5 rounded-full border border-lead-green/5">
+                    ✦ {axe.badge}
                   </span>
                 </div>
-                
-                <h3 className="font-extrabold text-lead-green text-sm sm:text-base mb-1.5">{axe.title}</h3>
-                <p className="text-[11px] sm:text-xs text-lead-green/75 leading-relaxed font-semibold">
-                  {axe.desc}
-                </p>
-              </div>
-
-              <div className="text-[9px] font-bold text-coral uppercase tracking-widest mt-3">
-                ✦ {axe.badge}
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 

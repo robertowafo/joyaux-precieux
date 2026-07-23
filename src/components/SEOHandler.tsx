@@ -138,46 +138,8 @@ export function SEOHandler({ currentPage }: SEOHandlerProps) {
           "closes": "19:00"
         }
       });
-
-      // FAQPage Rich Snippet integration using actual questions & answers
-      schemas.push({
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Comment se déroule la première séance d'écoute active ?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "La première prise de contact est gratuite et dure environ 15 minutes par appel ou message WhatsApp. C'est un moment convivial où vous m'exposez brièvement les blocages émotionnels ou de communication de votre foyer. Nous convenons ensuite d'une feuille de route pour de futures séances de guidance personnalisées."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Les séances d'accompagnement peuvent-elles se dérouler en visioconférence ?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Tout à fait ! Pour faciliter l'organisation des parents pressés et dépasser les frontières régionales, la quasi-totalité de mes guidances ont lieu en visioconférence (Google Meet, Zoom) ou par appel vocal de haute qualité, offrant une flexibilité totale."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Quelle est la différence entre l'accompagnement psycho-éducatif et une thérapie classique ?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Alors qu'une thérapie classique explore en profondeur le passé, l'accompagnement psycho-éducatif (ou guidance parentale) est orienté solution, action et immédiateté. Nous mettons en place des protocoles concrets à appliquer à la maison : cadres d'écrans, tables d'émotions, rituels de coucher, de façon pragmatique."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Comment intégrez-vous précisément la foi dans vos séances de guidance ?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "La foi chrétienne forme le socle spirituel de ma vision de l'harmonie familiale. J'associe ainsi les vérités éternelles des Écritures (amour, écoute mutuelle, autorité pleine de grâce) aux découvertes éprouvées de la Psychologie du Développement moderne. Toutefois, mes espaces d'écoute accueillent tout le monde sans aucun esprit de jugement ni d'obligation doctrinale."
-            }
-          }
-        ]
-      });
+      // NB: FAQPage rich snippet is injected dynamically by FAQSection from the
+      // live dashboard questions (see FAQSection.tsx) so every added question is indexed.
     }
 
     if (currentPage === 'articles') {

@@ -4,7 +4,7 @@ import { auth } from '../lib/auth';
 import {
   LayoutDashboard, FileText, Video, Clapperboard, Download,
   BookOpen, HelpCircle, Star, Users, LogOut, Menu,
-  ChevronRight, Youtube, Mail, Sparkles
+  ChevronRight, Youtube, Mail, Sparkles, CalendarCheck
 } from 'lucide-react';
 
 const NAV = [
@@ -19,6 +19,7 @@ const NAV = [
   { label: 'FAQ', path: '/admin/faqs', icon: HelpCircle },
   { label: 'Témoignages', path: '/admin/testimonials', icon: Star },
   { label: 'Accompagnements', path: '/admin/accompagnements', icon: Users },
+  { label: 'Réservations', path: '/admin/bookings', icon: CalendarCheck },
   { label: 'Emails', path: '/admin/emails', icon: Mail },
 ];
 

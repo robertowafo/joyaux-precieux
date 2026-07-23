@@ -28,4 +28,13 @@ export const publicApi = {
     });
     return res.json();
   },
+
+  createBooking: async (booking: Record<string, string>): Promise<{ success?: boolean; id?: number; error?: string }> => {
+    const res = await fetch(`${BASE}/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(booking),
+    });
+    return res.json();
+  },
 };

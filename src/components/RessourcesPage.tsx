@@ -25,6 +25,8 @@ interface Book {
   desc: string;
   benefits: string[];
   img: string;
+  link: string;
+  link_type: string;
 }
 
 export function RessourcesPage() {
@@ -75,6 +77,8 @@ export function RessourcesPage() {
         desc: String(bk.desc ?? ''),
         benefits: typeof bk.benefits === 'string' ? safeParse(bk.benefits) : (bk.benefits ?? []),
         img: String(bk.img ?? ''),
+        link: String(bk.link ?? ''),
+        link_type: String(bk.link_type ?? 'buy'),
       })));
     });
   }, []);
@@ -263,7 +267,7 @@ export function RessourcesPage() {
                         <p className="text-xs md:text-sm text-lead-green/70 font-semibold leading-relaxed mb-4">{book.desc}</p>
                       </div>
                       {book.benefits.length > 0 && (
-                        <div>
+                        <div className="mb-4">
                           <p className="text-[11px] font-bold text-coral/80 uppercase tracking-wider mb-2">✦ Bénéfices clés :</p>
                           <div className="flex flex-wrap gap-1.5">
                             {book.benefits.map((ben, i) => (
@@ -271,6 +275,14 @@ export function RessourcesPage() {
                             ))}
                           </div>
                         </div>
+                      )}
+                      {book.link && (
+                        <a
+                          href={book.link} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-lead-green text-white text-[11px] font-bold uppercase tracking-wider hover:bg-highlight transition-colors shadow-sm w-fit"
+                        >
+                          {book.link_type === 'download' ? '📥 Télécharger gratuitement' : '🛒 Se procurer le livre'}
+                        </a>
                       )}
                     </div>
                   </motion.div>

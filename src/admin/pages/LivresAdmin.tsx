@@ -13,11 +13,13 @@ interface Book {
   desc: string;
   benefits: string;
   img: string;
+  link: string;
+  link_type: string;
 }
 
 const EMPTY: Omit<Book, 'id'> = {
   title: '', author: '', rating: '⭐⭐⭐⭐⭐',
-  desc: '', benefits: '[]', img: '',
+  desc: '', benefits: '[]', img: '', link: '', link_type: 'buy',
 };
 
 const COLUMNS: Column<Book>[] = [
@@ -101,6 +103,20 @@ export function LivresAdmin() {
           <input className={input} value={benefitsInput} onChange={e => setBenefitsInput(e.target.value)}
             placeholder="Pragmatique, Illustrations concrètes, Basé sur les neurosciences" />
         </Field>
+        <div className="grid grid-cols-3 gap-4">
+          <Field label="Type de lien">
+            <select className={input} value={form.link_type ?? 'buy'} onChange={e => set('link_type', e.target.value)}>
+              <option value="buy">🛒 Acheter</option>
+              <option value="download">📥 Télécharger (gratuit)</option>
+            </select>
+          </Field>
+          <div className="col-span-2">
+            <Field label="Lien (achat ou téléchargement)">
+              <input className={input} type="url" value={form.link ?? ''} onChange={e => set('link', e.target.value)}
+                placeholder="https://... (Amazon, PDF, librairie...)" />
+            </Field>
+          </div>
+        </div>
         <Field label="Couverture du livre">
           <FileUpload value={form.img ?? ''} onChange={v => set('img', v)}
             accept="image/*" label="la couverture" previewType="image" />

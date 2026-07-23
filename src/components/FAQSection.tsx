@@ -5,22 +5,41 @@ import { publicApi } from '../lib/publicApi';
 
 interface FAQ { id: number; question: string; answer: string; }
 
-const STATIC_FAQS: FAQ[] = [
-  { id: 1, question: "Comment se déroule la première séance d'écoute active ?", answer: "La première prise de contact est gratuite et dure environ 15 minutes par appel ou message WhatsApp. C'est un moment convivial où vous m'exposez brièvement les blocages émotionnels ou de communication de votre foyer. Nous convenons ensuite d'une feuille de route pour de futures séances de guidance personnalisées." },
-  { id: 2, question: "Les séances d'accompagnement peuvent-elles se dérouler en visioconférence ?", answer: "Tout à fait ! Pour faciliter l'organisation des parents pressés et dépasser les frontières régionales, la quasi-totalité de mes guidances ont lieu en visioconférence (Google Meet, Zoom) ou par appel vocal de haute qualité, offrant une flexibilité totale." },
-  { id: 3, question: "Quelle est la différence entre l'accompagnement psycho-éducatif et une thérapie classique ?", answer: "Alors qu'une thérapie classique explore en profondeur le passé, l'accompagnement psycho-éducatif (ou guidance parentale) est orienté solution, action et immédiateté. Nous mettons en place des protocoles concrets à appliquer à la maison : cadres d'écrans, tables d'émotions, rituels de coucher, de façon pragmatique." },
-  { id: 4, question: "Comment intégrez-vous précisément la foi dans vos séances de guidance ?", answer: "La foi chrétienne forme le socle spirituel de ma vision de l'harmonie familiale. J'associe ainsi les vérités éternelles des Écritures (amour, écoute mutuelle, autorité pleine de grâce) aux découvertes éprouvées de la Psychologie du Développement moderne. Toutefois, mes espaces d'écoute accueillent tout le monde sans aucun esprit de jugement ni d'obligation doctrinale." },
-];
+const WHATSAPP = 'https://wa.me/237621479061?text=' + encodeURIComponent("Bonjour Madame Lina, j'ai une question sur l'accompagnement de mon enfant / mon foyer :");
 
 export function FAQSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
-  const [faqs, setFaqs] = useState<FAQ[]>(STATIC_FAQS);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   useEffect(() => {
     publicApi.faqs().then(data => {
-      if (data.length > 0) setFaqs(data as unknown as FAQ[]);
+      setFaqs(data as unknown as FAQ[]);
     });
   }, []);
+
+  // Dynamic FAQPage rich snippet — every question added from the dashboard
+  // becomes a Google-indexable Q&A, boosting search visibility.
+  useEffect(() => {
+    if (faqs.length === 0) return;
+    const id = 'faq-jsonld';
+    document.getElementById(id)?.remove();
+    const script = document.createElement('script');
+    script.id = id;
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map(f => ({
+        '@type': 'Question',
+        name: f.question,
+        acceptedAnswer: { '@type': 'Answer', text: f.answer },
+      })),
+    });
+    document.head.appendChild(script);
+    return () => { document.getElementById(id)?.remove(); };
+  }, [faqs]);
+
+  if (faqs.length === 0) return null;
 
   return (
     <section id="faq" className="py-24 md:py-36 px-6 lg:px-12 max-w-[90rem] mx-auto border-t border-lead-green/10 bg-bg">
@@ -43,10 +62,12 @@ export function FAQSection() {
           </p>
           
           <a
-            href="#contact"
-            className="px-6 py-3.5 bg-[#e05a47] hover:bg-lead-green text-white text-xs font-bold uppercase tracking-wider rounded-full transition-colors font-sans"
+            href={WHATSAPP}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-6 py-3.5 bg-[#25D366] hover:bg-lead-green text-white text-xs font-bold uppercase tracking-wider rounded-full transition-colors font-sans flex items-center gap-2"
           >
-             Poser une autre question
+             <span className="text-sm">📲</span> Poser une autre question
           </a>
         </div>
 

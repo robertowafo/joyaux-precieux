@@ -45,6 +45,25 @@ CREATE TABLE IF NOT EXISTS books (
   desc TEXT NOT NULL,
   benefits TEXT NOT NULL DEFAULT '[]',
   img TEXT NOT NULL DEFAULT '/images/extra_children_reading.jpg',
+  link TEXT NOT NULL DEFAULT '',
+  link_type TEXT NOT NULL DEFAULT 'buy',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Réservations (prises de rendez-vous)
+CREATE TABLE IF NOT EXISTS bookings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  service TEXT NOT NULL DEFAULT '',
+  date TEXT NOT NULL DEFAULT '',
+  time TEXT NOT NULL DEFAULT '',
+  full_name TEXT NOT NULL DEFAULT '',
+  phone TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL DEFAULT '',
+  child_name TEXT NOT NULL DEFAULT '',
+  child_age TEXT NOT NULL DEFAULT '',
+  context TEXT NOT NULL DEFAULT '',
+  orientation TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'nouveau',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

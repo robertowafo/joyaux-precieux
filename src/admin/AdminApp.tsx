@@ -13,6 +13,7 @@ import { FaqAdmin } from './pages/FaqAdmin';
 import { TemoignagesAdmin } from './pages/TemoignagesAdmin';
 import { AccompagnementsAdmin } from './pages/AccompagnementsAdmin';
 import { StoriesAdmin } from './pages/StoriesAdmin';
+import { BookingsAdmin } from './pages/BookingsAdmin';
 import { EmailsAdmin } from './pages/EmailsAdmin';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -42,6 +43,7 @@ export function AdminApp() {
       <Route path="/testimonials" element={<G><TemoignagesAdmin /></G>} />
       <Route path="/accompagnements" element={<G><AccompagnementsAdmin /></G>} />
       <Route path="/stories" element={<G><StoriesAdmin /></G>} />
+      <Route path="/bookings" element={<G><BookingsAdmin /></G>} />
       <Route path="/emails" element={<G><EmailsAdmin /></G>} />
       <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>

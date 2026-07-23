@@ -28,6 +28,18 @@ function clientIp(request: Request): string {
   return request.headers.get('CF-Connecting-IP') ?? 'unknown';
 }
 
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&#x27;/gi, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
+}
+
 // True if `ip` has already logged >= maxAttempts for `action` within the window.
 async function isRateLimited(
   env: Env,
@@ -65,12 +77,14 @@ const TABLE_MAP: Record<string, string> = {
   video_capsules: 'video_capsules',
   recommendations: 'video_recommendations',
   stories: 'stories',
+  bookings: 'bookings',
 };
 
 const ALLOWED_COLUMNS: Record<string, string[]> = {
   articles: ['title', 'desc', 'content', 'tag', 'date', 'read_time', 'img', 'author', 'role', 'featured'],
   videos: ['title', 'duration', 'desc', 'category', 'img', 'url', 'speaker'],
-  books: ['title', 'author', 'rating', 'desc', 'benefits', 'img'],
+  books: ['title', 'author', 'rating', 'desc', 'benefits', 'img', 'link', 'link_type'],
+  bookings: ['service', 'date', 'time', 'full_name', 'phone', 'email', 'child_name', 'child_age', 'context', 'orientation', 'status'],
   pdf_resources: ['title', 'desc', 'type', 'color', 'accent', 'badge', 'img', 'file_url'],
   stories: ['emoji', 'title', 'hero', 'teaching', 'story_snippet', 'parent_tip', 'order_idx'],
   faqs: ['question', 'answer', 'order_idx'],
@@ -256,6 +270,96 @@ export default {
       }
       if (request.method === 'DELETE' && parts[2]) {
         await env.DB.prepare(`DELETE FROM emails WHERE id = ?`).bind(parts[2]).run();
+        return json({ success: true });
+      }
+    }
+
+    // ── GET /api/link-preview?url= ─ (auto-fill for recommended videos) ──────
+    if (parts[1] === 'link-preview' && request.method === 'GET') {
+      if (!requireAuth(request, env)) return json({ error: 'Unauthorized' }, 401);
+      const target = url.searchParams.get('url') ?? '';
+      if (!/^https?:\/\//i.test(target)) return json({ error: 'URL invalide' }, 400);
+      const platform = /youtu\.?be/i.test(target) ? 'YouTube' : /vimeo/i.test(target) ? 'Vimeo' : /tiktok/i.test(target) ? 'TikTok' : /facebook/i.test(target) ? 'Facebook' : 'Autre';
+      const preview = { title: '', desc: '', thumbnail: '', platform };
+
+      // 1) oEmbed first — reliable for YouTube/Vimeo/TikTok (title + thumbnail).
+      const oembedUrl =
+        platform === 'YouTube' ? `https://www.youtube.com/oembed?url=${encodeURIComponent(target)}&format=json` :
+        platform === 'Vimeo' ? `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(target)}` :
+        platform === 'TikTok' ? `https://www.tiktok.com/oembed?url=${encodeURIComponent(target)}` : '';
+      if (oembedUrl) {
+        try {
+          const r = await fetch(oembedUrl, { cf: { cacheTtl: 300 } });
+          if (r.ok) {
+            const o = (await r.json()) as Record<string, unknown>;
+            preview.title = String(o.title ?? '');
+            preview.thumbnail = String(o.thumbnail_url ?? '');
+            preview.desc = String(o.description ?? '');
+          }
+        } catch { /* fall through to OG scraping */ }
+      }
+
+      // 2) OG scraping to fill any gaps (works for generic pages).
+      if (!preview.title || !preview.thumbnail || !preview.desc) {
+        try {
+          const res = await fetch(target, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; JoyauxBot/1.0; +https://joyaux-precieux.pages.dev)' },
+            cf: { cacheTtl: 300 },
+          });
+          const html = (await res.text()).slice(0, 400_000);
+          const meta = (prop: string): string => {
+            const patterns = [
+              new RegExp(`<meta[^>]+(?:property|name)=["']${prop}["'][^>]+content=["']([^"']+)["']`, 'i'),
+              new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']${prop}["']`, 'i'),
+            ];
+            for (const p of patterns) { const m = html.match(p); if (m) return decodeEntities(m[1]); }
+            return '';
+          };
+          const titleTag = html.match(/<title[^>]*>([^<]*)<\/title>/i);
+          preview.title = preview.title || meta('og:title') || meta('twitter:title') || (titleTag ? decodeEntities(titleTag[1]).trim() : '');
+          preview.desc = preview.desc || meta('og:description') || meta('twitter:description') || meta('description');
+          preview.thumbnail = preview.thumbnail || meta('og:image') || meta('twitter:image');
+        } catch { /* ignore */ }
+      }
+
+      if (!preview.title) return json({ error: 'Impossible de récupérer les informations du lien.' }, 502);
+      return json(preview);
+    }
+
+    // ── /api/bookings ─ public POST (create), auth GET/PUT/DELETE ────────────
+    if (parts[1] === 'bookings') {
+      if (request.method === 'POST' && !parts[2]) {
+        const ip = clientIp(request);
+        if (await isRateLimited(env, ip, 'booking', 8, 60)) {
+          return json({ error: 'Trop de tentatives. Réessayez plus tard.' }, 429);
+        }
+        await logAttempt(env, ip, 'booking');
+        const body = (await request.json()) as Record<string, unknown>;
+        const cols = ALLOWED_COLUMNS.bookings.filter(c => c !== 'status');
+        const vals = cols.map(c => String(body[c] ?? ''));
+        try {
+          const result = await env.DB.prepare(
+            `INSERT INTO bookings (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`
+          ).bind(...vals).run();
+          return json({ success: true, id: result.meta.last_row_id }, 201);
+        } catch {
+          return json({ error: 'Erreur serveur' }, 500);
+        }
+      }
+      if (!requireAuth(request, env)) return json({ error: 'Unauthorized' }, 401);
+      if (request.method === 'GET') {
+        const { results } = await env.DB.prepare(`SELECT * FROM bookings ORDER BY created_at DESC`).all();
+        return json(results);
+      }
+      if (request.method === 'PUT' && parts[2]) {
+        const body = (await request.json()) as Record<string, unknown>;
+        if (typeof body.status === 'string') {
+          await env.DB.prepare(`UPDATE bookings SET status = ? WHERE id = ?`).bind(body.status, parts[2]).run();
+        }
+        return json({ success: true });
+      }
+      if (request.method === 'DELETE' && parts[2]) {
+        await env.DB.prepare(`DELETE FROM bookings WHERE id = ?`).bind(parts[2]).run();
         return json({ success: true });
       }
     }

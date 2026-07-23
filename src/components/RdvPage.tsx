@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { publicApi } from '../lib/publicApi';
 import { 
   Heart, 
   Calendar as CalendarIcon, 
@@ -172,11 +173,27 @@ export function RdvPage({ onNavigate }: RdvPageProps) {
     }
   };
 
-  const submitBooking = () => {
+  const submitBooking = async () => {
     if (!formData.fullName || !formData.phone || !formData.email) {
       alert('Veuillez remplir les informations obligatoires (Nom, Téléphone, Email).');
       return;
     }
+    // Persist the booking so it can be reviewed in the dashboard.
+    try {
+      await publicApi.createBooking({
+        service: selectedService?.title ?? '',
+        date: formatDateFrench(selectedDate),
+        time: selectedTime ?? '',
+        full_name: formData.fullName,
+        phone: formData.phone,
+        email: formData.email,
+        child_name: formData.childName,
+        child_age: formData.childAge,
+        context: formData.context,
+        orientation: formData.spiritualPreference === 'christian' ? 'Base chrétienne'
+          : formData.spiritualPreference === 'clinical' ? 'Base clinique' : 'Mixte / libre',
+      });
+    } catch { /* the WhatsApp confirmation remains the fallback channel */ }
     setStep(4);
   };
 
@@ -752,7 +769,7 @@ export function RdvPage({ onNavigate }: RdvPageProps) {
               <div className="mt-12 max-w-xl mx-auto p-4 sm:p-6 bg-lead-green/5 border border-lead-green/5 rounded-2xl text-left flex items-start gap-3">
                 <AlertCircle size={18} className="text-coral shrink-0 mt-0.5" />
                 <div className="text-[10px] sm:text-xs text-lead-green/75 leading-relaxed font-medium">
-                  <strong className="text-lead-green">Note importante :</strong> Les consultations se déroulent en visioconférence sécurisée (Zoom / WhatsApp Video) ou en présentiel à Douala (selon accord). Les instructions de règlement (Orange Money / MTN Mobile Money / Wave) vous seront transmises directement lors de la prise de contact WhatsApp.
+                  <strong className="text-lead-green">Note importante :</strong> Les consultations se déroulent en visioconférence sécurisée (Zoom / WhatsApp Video) ou par appel vocal de haute qualité. Les modalités pratiques vous seront précisées lors de la prise de contact par WhatsApp.
                 </div>
               </div>
             </motion.div>
@@ -775,21 +792,21 @@ export function RdvPage({ onNavigate }: RdvPageProps) {
 
         <div className="flex items-start gap-3.5 bg-white p-5 rounded-2xl border border-lead-green/5">
           <div className="p-2.5 bg-coral/10 text-coral rounded-xl shrink-0">
-            <Award size={18} />
-          </div>
-          <div>
-            <h4 className="font-extrabold text-xs sm:text-sm text-lead-green mb-1">Rigueur Universitaire</h4>
-            <p className="text-[11px] text-lead-green/70 leading-normal font-medium">Chaque clé s'appuie sur la psychologie du développement cognitif de l'enfant et les neurosciences cliniques.</p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3.5 bg-white p-5 rounded-2xl border border-lead-green/5">
-          <div className="p-2.5 bg-[#ff9d00]/10 text-[#a16207] rounded-xl shrink-0">
             <Heart size={18} />
           </div>
           <div>
             <h4 className="font-extrabold text-xs sm:text-sm text-lead-green mb-1">Soutien Sur-Mesure</h4>
             <p className="text-[11px] text-lead-green/70 leading-normal font-medium">Un dialogue adapté à votre rythme familial et orienté vers une mise en pratique sereine et efficace.</p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3.5 bg-white p-5 rounded-2xl border border-lead-green/5">
+          <div className="p-2.5 bg-[#ff9d00]/10 text-[#a16207] rounded-xl shrink-0">
+            <Award size={18} />
+          </div>
+          <div>
+            <h4 className="font-extrabold text-xs sm:text-sm text-lead-green mb-1">Écoute Bienveillante</h4>
+            <p className="text-[11px] text-lead-green/70 leading-normal font-medium">Un accueil sans jugement, à l'écoute de votre histoire familiale et de vos valeurs.</p>
           </div>
         </div>
       </div>

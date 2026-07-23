@@ -4,7 +4,7 @@ import { Layout } from '../components/Layout';
 import { api } from '../lib/api';
 import {
   FileText, Video, Clapperboard, Download, BookOpen,
-  HelpCircle, Star, Users, ArrowRight, Youtube, Mail, Sparkles
+  HelpCircle, Star, Users, ArrowRight, Youtube, Mail, Sparkles, CalendarCheck
 } from 'lucide-react';
 
 const CARDS = [
@@ -18,6 +18,7 @@ const CARDS = [
   { key: 'faqs', label: 'FAQ', icon: HelpCircle, color: 'bg-cyan-50 text-cyan-700', border: 'border-cyan-100', path: '/admin/faqs' },
   { key: 'testimonials', label: 'Témoignages', icon: Star, color: 'bg-yellow-50 text-yellow-700', border: 'border-yellow-100', path: '/admin/testimonials' },
   { key: 'pillars', label: 'Accompagnements', icon: Users, color: 'bg-rose-50 text-rose-700', border: 'border-rose-100', path: '/admin/accompagnements' },
+  { key: 'bookings', label: 'Réservations', icon: CalendarCheck, color: 'bg-indigo-50 text-indigo-700', border: 'border-indigo-100', path: '/admin/bookings' },
   { key: 'emails', label: 'Emails collectés', icon: Mail, color: 'bg-teal-50 text-teal-700', border: 'border-teal-100', path: '/admin/emails' },
 ];
 
