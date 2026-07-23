@@ -4,7 +4,7 @@ import { auth } from '../lib/auth';
 import {
   LayoutDashboard, FileText, Video, Clapperboard, Download,
   BookOpen, HelpCircle, Star, Users, LogOut, Menu,
-  ChevronRight, Youtube, Mail
+  ChevronRight, Youtube, Mail, Sparkles
 } from 'lucide-react';
 
 const NAV = [
@@ -15,6 +15,7 @@ const NAV = [
   { label: 'Capsules Vidéo', path: '/admin/video-capsules', icon: Clapperboard },
   { label: 'Ressources PDF', path: '/admin/resources', icon: Download },
   { label: 'Livres', path: '/admin/books', icon: BookOpen },
+  { label: 'Histoires Thérapeutiques', path: '/admin/stories', icon: Sparkles },
   { label: 'FAQ', path: '/admin/faqs', icon: HelpCircle },
   { label: 'Témoignages', path: '/admin/testimonials', icon: Star },
   { label: 'Accompagnements', path: '/admin/accompagnements', icon: Users },

@@ -12,77 +12,40 @@ interface FeaturedResource {
   icon: React.ReactNode;
   type: string;
   explainer: string;
-  img: string;
-  title: string;
-  duration: string;
   actionText: string;
 }
 
-const STATIC_FEATURED: FeaturedResource[] = [
+// Category overview of what the Ressources page offers (navigation teaser, not content).
+const FEATURED: FeaturedResource[] = [
   {
     icon: <Video size={20} className="text-[#ff9d00]" />,
-    type: "🎥 Capsule Vidéo",
-    explainer: "De courtes vidéos filmées au téléphone (3 à 5 min), à regarder entre deux tâches ou en fin de soirée.",
-    img: "/images/hero_5_psychologist.jpg",
-    title: "Ex. : Désamorcer une crise de colère en public",
-    duration: "4 min • Petite Enfance",
-    actionText: "Voir les capsules"
+    type: "🎥 Capsules Vidéo",
+    explainer: "De courtes vidéos (3 à 5 min) à regarder entre deux tâches ou en fin de soirée — Les Minutes Précieuses.",
+    actionText: "Voir les capsules",
   },
   {
     icon: <Film size={20} className="text-coral" />,
     type: "🎬 Vidéos & Conférences",
-    explainer: "Des mini-conférences filmées et des décryptages plus approfondis, pour aller plus loin (10 à 20 min).",
-    img: "/images/african_family_outdoor.jpg",
-    title: "Ex. : Gestion saine de l'autorité parentale",
-    duration: "12:45 • Parentalité",
-    actionText: "Regarder les vidéos"
+    explainer: "Des mini-conférences filmées et des décryptages plus approfondis pour aller plus loin.",
+    actionText: "Regarder les vidéos",
   },
   {
     icon: <FileDown size={20} className="text-lead-green" />,
     type: "📥 Fiches Pratiques (PDF)",
-    explainer: "Des fiches et guides imprimables à garder sous la main, prêts à l'emploi en 2 minutes.",
-    img: "/images/resource_2_emotion_journal.jpg",
-    title: "Ex. : La Boussole des Émotions",
-    duration: "2 min • PDF Gratuit",
-    actionText: "Télécharger les fiches"
+    explainer: "Des fiches et guides à consulter ou imprimer, prêts à l'emploi en 2 minutes.",
+    actionText: "Consulter les fiches",
   },
   {
     icon: <BookOpen size={20} className="text-[#a16207]" />,
     type: "📖 Livres Recommandés",
-    explainer: "Une sélection d'ouvrages choisis par Lina pour approfondir la psychologie du développement à la maison.",
-    img: "/images/extra_children_reading.jpg",
-    title: "Ex. : Parler pour que les enfants écoutent...",
-    duration: "Adèle Faber & Elaine Mazlish",
-    actionText: "Découvrir les livres"
-  }
+    explainer: "Une sélection d'ouvrages choisis par Lina pour approfondir la psychologie du développement.",
+    actionText: "Découvrir les livres",
+  },
 ];
 
 export function Methodology({ onNavigate }: MethodologyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [featured, setFeatured] = useState<FeaturedResource[]>(STATIC_FEATURED);
-
-  useEffect(() => {
-    Promise.all([
-      publicApi.videoCapsules(),
-      publicApi.videos(),
-      publicApi.resources(),
-      publicApi.books(),
-    ]).then(([capsules, videos, resources, books]) => {
-      const next = [...STATIC_FEATURED];
-      const cap = capsules[0] as Record<string, unknown> | undefined;
-      if (cap) {
-        const category = String(cap.badge ?? '').replace(/^\S+\s/, '').split('•')[0].trim();
-        next[0] = { ...next[0], title: `Ex. : ${cap.title}`, duration: `${cap.duration} • ${category}` };
-      }
-      const vid = videos[0] as Record<string, unknown> | undefined;
-      if (vid) next[1] = { ...next[1], title: `Ex. : ${vid.title}`, duration: `${vid.duration} • ${vid.category}`, img: String(vid.img ?? next[1].img) };
-      const res = resources[0] as Record<string, unknown> | undefined;
-      if (res) next[2] = { ...next[2], title: `Ex. : ${res.title}`, duration: String(res.badge ?? 'PDF Gratuit'), img: String(res.img ?? next[2].img) };
-      const book = books[0] as Record<string, unknown> | undefined;
-      if (book) next[3] = { ...next[3], title: `Ex. : ${book.title}`, duration: `Par ${book.author}`, img: String(book.img ?? next[3].img) };
-      setFeatured(next);
-    });
-  }, []);
+  const featured = FEATURED;
 
   const handleAnnouncementClick = (targetId: string) => {
     if (onNavigate) {
@@ -539,42 +502,24 @@ export function Methodology({ onNavigate }: MethodologyProps) {
             className="group bg-white border border-lead-green/10 hover:border-lead-green/30 rounded-[2.5rem] overflow-hidden transition-all duration-300 flex flex-col justify-between shadow-xs hover:shadow-md cursor-pointer text-left"
             onClick={() => onNavigate?.('ressources')}
           >
-            {/* Illustrative thumbnail */}
-            <div className="relative aspect-[16/11] w-full overflow-hidden bg-mint">
-              <img
-                src={resource.img}
-                alt={resource.type}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-transparent" />
-
+            <div className="p-7 flex flex-col justify-between flex-grow relative">
               {/* Small blooming flower marker, ties every format back to the "Joyaux" theme */}
               <motion.span
-                className="absolute top-3 right-3 text-xl select-none drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]"
+                className="absolute top-5 right-5 text-lg select-none"
                 animate={{ rotate: [0, 20, -20, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: idx * 0.3 }}
               >
                 🌸
               </motion.span>
 
-              <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/50 shadow-xs">
-                {resource.icon}
-                <span className="text-[10px] font-extrabold text-lead-green uppercase tracking-wider">{resource.type}</span>
-              </div>
-            </div>
-
-            <div className="p-7 flex flex-col justify-between flex-grow">
               <div>
-                <p className="text-xs text-lead-green/80 font-semibold leading-relaxed mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-mint flex items-center justify-center mb-5 shadow-xs group-hover:scale-110 transition-transform">
+                  {resource.icon}
+                </div>
+                <h4 className="text-[13px] font-extrabold text-lead-green uppercase tracking-wide mb-2.5">{resource.type}</h4>
+                <p className="text-xs text-lead-green/80 font-semibold leading-relaxed">
                   {resource.explainer}
                 </p>
-
-                <h4 className="font-friendly font-bold text-lead-green text-sm mb-1.5 leading-snug italic line-clamp-2 min-h-[2.4em]">
-                  {resource.title}
-                </h4>
-
-                <span className="text-[10px] font-bold text-[#ff9d00] block">{resource.duration}</span>
               </div>
 
               <div className="flex items-center gap-1.5 text-xs font-bold text-lead-green group-hover:text-coral transition-colors mt-6 pt-4 border-t border-lead-green/5">

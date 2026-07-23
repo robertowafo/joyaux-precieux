@@ -11,33 +11,9 @@ interface Testimonial {
   img: string;
 }
 
-const STATIC_TESTIMONIALS: Testimonial[] = [
-  {
-    text: "« Nous étions dans une impasse de communication. Grâce aux séances de guidance parentale et à l'écoute active, Lucas a pu mettre des mots sur son anxiété scolaire. Le dialogue est restauré. »",
-    author: "Sarah",
-    role: "Maman de Lucas (14 ans)",
-    rating: 5,
-    img: "/images/avatar_1_young_mother.jpg"
-  },
-  {
-    text: "« Trouver des activités psycho-éducatives qui éveillent l’intelligence émotionnelle de mon garçon tout en respectant notre foi chrétienne était un défi. Grâce aux séances de guidance de Lina, l'harmonie est de retour d'une façon extraordinaire ! »",
-    author: "Hortense M.",
-    role: "Maman de Noé (7 ans)",
-    rating: 5,
-    img: "/images/avatar_3_grandparent.jpg"
-  },
-  {
-    text: "« Les fiches de guidance et la routine d'écoute des Minutes Précieuses ont transformé l'ambiance à la maison. Les tensions ont baissé de moitié. On communique enfin avec vérité et avec grâce de l'écosystème familial. »",
-    author: "Jean-Eudes K.",
-    role: "Père de deux ados (13 et 15 ans)",
-    rating: 5,
-    img: "/images/avatar_2_father.jpg"
-  }
-];
-
 export function CallToAction() {
   const [activeIdx, setActiveIdx] = useState(0);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(STATIC_TESTIMONIALS);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -45,7 +21,7 @@ export function CallToAction() {
 
   useEffect(() => {
     publicApi.testimonials().then(data => {
-      if (data.length > 0) setTestimonials(data as unknown as Testimonial[]);
+      setTestimonials(data as unknown as Testimonial[]);
     });
   }, []);
 
@@ -88,6 +64,7 @@ export function CallToAction() {
 
   return (
     <section id="temoignages" className="py-24 md:py-36 px-6 lg:px-12 bg-[#fffdf9] max-w-[90rem] mx-auto border-t border-lead-green/10 rounded-b-[3rem] shadow-sm">
+      {testimonials.length > 0 && (<>
         <div className="text-center mb-16 flex flex-col items-center">
           <span className="uppercase text-[11px] font-bold tracking-[0.2em] text-[#ff9d00] mb-4 font-friendly flex items-center gap-1.5">
             <MessageCircle size={14} className="fill-current text-[#ff9d00]" />
@@ -158,6 +135,7 @@ export function CallToAction() {
              </button>
           </div>
        </div>
+      </>)}
 
        {/* Interactive stats grid inspired by Webflow bento grids */}
        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-20">

@@ -1,88 +1,57 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Heart, HelpCircle, RotateCw, BookOpen, Volume2 } from 'lucide-react';
+import { Sparkles, Heart, RotateCw, BookOpen, Volume2 } from 'lucide-react';
+import { publicApi } from '../lib/publicApi';
 
 interface StoryTheme {
-  id: string;
+  id: number;
   emoji: string;
   title: string;
   hero: string;
   teaching: string;
   storySnippet: string;
   parentTip: string;
-  color: string;
-  textColor: string;
 }
 
 export function StorySpinner() {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [selectedThemeId, setSelectedThemeId] = useState<string>("chouette");
+  const [selectedIdx, setSelectedIdx] = useState(0);
   const [rotation, setRotation] = useState(0);
+  const [themes, setThemes] = useState<StoryTheme[]>([]);
 
-  const themes: StoryTheme[] = [
-    {
-      id: "chouette",
-      emoji: "🦉",
-      title: "La Chouette Somnolente",
-      hero: "Plume la Chouette",
-      teaching: "Transition de Coucher & Sommeil calme",
-      storySnippet: "Plume la petite chouette n'arrivait pas à fermer l'œil ce soir-millénaire. Son papa s'assit sur la branche et lui dit : 'Ferme tes grands yeux d'or, et écoute le chant du vent de la forêt. Il emporte tes soucis loin d'ici.' Plume respira profondément, sentit le duvet chaud de son père, et s'endormit enfin sous le ciel étoilé.",
-      parentTip: "Astuce Clinique : Le soir, l'enfant a besoin d'entendre une voix basse, lente, d'enveloppe monotone. Accompagnez son souffle en ralentissant votre propre discours au lit.",
-      color: "bg-[#e3f2fd]/80",
-      textColor: "text-[#2563eb]"
-    },
-    {
-      id: "renard",
-      emoji: "🦊",
-      title: "Le Renard Patient",
-      hero: "Rafi le Renard",
-      teaching: "Gestion de Colère & Co-Régulation",
-      storySnippet: "Rafi avait fait tomber sa belle tour de pommes de pin. Une vague de feu monta dans son cœur de petit renard ! Son amie la biche s'approcha prudemment : 'Rafi, souffle sur ton feu pour l'éteindre comme une bougie.' Rafi souffla fort trois fois. Le feu s'évanouit et fit place à un grand sourire.",
-      parentTip: "Astuce Clinique : Ne dites pas à un enfant d'arrêter sa crise de colère. Invitez-le à souffler ensemble sur une bougie virtuelle pour calmer physiologiquement son rythme cardiaque.",
-      color: "from-[#fbebeb] to-[#e05a47]/10",
-      textColor: "text-[#e05a47]"
-    },
-    {
-      id: "elephant",
-      emoji: "🐘",
-      title: "L'Éléphant Courageux",
-      hero: "Éli l'Éléphanteau",
-      teaching: "Confiance en soi & Peur du Noir",
-      storySnippet: "Éli avait peur des ombres projetées sur le mur de sa grotte. Sa maman prit sa grande trompe : 'Regarde, Éli, ces monstres sont créés par la lune. Faisons danser nos ombres avec elle.' Elles rigolèrent ensemble et les monstres devinrent de joyeux compagnons gesticulant en rythme.",
-      parentTip: "Astuce Clinique : Désacralisez la peur du noir par le jeu. La chasse aux ombres rigolotes dédramatise la panique nocturne chez les enfants de 2 à 10 ans.",
-      color: "bg-[#fdf6e2]/80",
-      textColor: "text-[#a16207]"
-    },
-    {
-      id: "tortue",
-      emoji: "🐢",
-      title: "La Tortue Expressive",
-      hero: "Tito la Tortue",
-      teaching: "Rivalité fraternelle & Partage de l'amour",
-      storySnippet: "Tito croyait que sa maman aimait plus sa petite sœur parce qu'elle passait la journée à la soigner. Sa maman s'installa tout près d'elle : 'Mon amour pour toi est comme le soleil. Ce n'est pas parce qu'il éclaire ta sœur qu'il arrête de te réchauffer.' Tito rentra sa tête et se sentit infiniment aimée.",
-      parentTip: "Astuce Clinique : Rassurez l'aîné en lui accordant 10 minutes exclusives où vous êtes entièrement dévolu à lui. L'antidote à la jalousie fraternelle est le temps exclusif.",
-      color: "bg-[#e8f1ec]/80",
-      textColor: "text-[#1f4a38]"
-    }
-  ];
+  useEffect(() => {
+    publicApi.stories().then(rows => {
+      const mapped = (rows as any[])
+        .sort((a, b) => (a.order_idx ?? 0) - (b.order_idx ?? 0))
+        .map(r => ({
+          id: Number(r.id),
+          emoji: String(r.emoji ?? '🦉'),
+          title: String(r.title ?? ''),
+          hero: String(r.hero ?? ''),
+          teaching: String(r.teaching ?? ''),
+          storySnippet: String(r.story_snippet ?? ''),
+          parentTip: String(r.parent_tip ?? ''),
+        }));
+      setThemes(mapped);
+    });
+  }, []);
 
   const handleSpin = () => {
-    if (isSpinning) return;
+    if (isSpinning || themes.length === 0) return;
     setIsSpinning(true);
-    
-    // Spin the wheel multiple full rotations + an arbitrary random offset
-    const randomTheme = themes[Math.floor(Math.random() * themes.length)];
-    const additionalDeg = 720 + (themes.indexOf(randomTheme) * 90);
-    const destinationRot = rotation + additionalDeg;
-    setRotation(destinationRot);
-
+    const randomIdx = Math.floor(Math.random() * themes.length);
+    const additionalDeg = 720 + (randomIdx * 90);
+    setRotation(rotation + additionalDeg);
     setTimeout(() => {
-      setSelectedThemeId(randomTheme.id);
+      setSelectedIdx(randomIdx);
       setIsSpinning(false);
     }, 1500);
   };
 
-  const activeTheme = themes.find(t => t.id === selectedThemeId) || themes[0];
+  if (themes.length === 0) return null;
+
+  const activeTheme = themes[selectedIdx] || themes[0];
+  const wheelEmojis = themes.slice(0, 4).map(t => t.emoji);
 
   return (
     <div className="w-full max-w-5xl mx-auto py-12 px-6 relative z-10 font-friendly">
@@ -117,11 +86,11 @@ export function StorySpinner() {
               <div className="absolute inset-x-0 h-0.5 bg-lead-green/5 top-1/2 -translate-y-1/2" />
               <div className="absolute inset-y-0 w-0.5 bg-lead-green/5 left-1/2 -translate-x-1/2" />
 
-              {/* Individual sectoral emojis */}
-              <div className="absolute top-6 left-1/2 -translate-x-1/2 text-3xl select-none">🦉</div>
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 text-3xl select-none">🦊</div>
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-3xl select-none">🐘</div>
-              <div className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl select-none">🐢</div>
+              {/* Individual sectoral emojis (from managed stories) */}
+              {wheelEmojis[0] && <div className="absolute top-6 left-1/2 -translate-x-1/2 text-3xl select-none">{wheelEmojis[0]}</div>}
+              {wheelEmojis[1] && <div className="absolute right-6 top-1/2 -translate-y-1/2 text-3xl select-none">{wheelEmojis[1]}</div>}
+              {wheelEmojis[2] && <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-3xl select-none">{wheelEmojis[2]}</div>}
+              {wheelEmojis[3] && <div className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl select-none">{wheelEmojis[3]}</div>}
             </motion.div>
 
             {/* Spinner absolute Pin Pointer */}

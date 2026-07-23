@@ -64,6 +64,7 @@ const TABLE_MAP: Record<string, string> = {
   steps: 'methodology_steps',
   video_capsules: 'video_capsules',
   recommendations: 'video_recommendations',
+  stories: 'stories',
 };
 
 const ALLOWED_COLUMNS: Record<string, string[]> = {
@@ -71,6 +72,7 @@ const ALLOWED_COLUMNS: Record<string, string[]> = {
   videos: ['title', 'duration', 'desc', 'category', 'img', 'url', 'speaker'],
   books: ['title', 'author', 'rating', 'desc', 'benefits', 'img'],
   pdf_resources: ['title', 'desc', 'type', 'color', 'accent', 'badge', 'img', 'file_url'],
+  stories: ['emoji', 'title', 'hero', 'teaching', 'story_snippet', 'parent_tip', 'order_idx'],
   faqs: ['question', 'answer', 'order_idx'],
   testimonials: ['text', 'author', 'role', 'rating', 'img'],
   pillars: ['title', 'desc', 'icon', 'badge', 'time', 'order_idx'],

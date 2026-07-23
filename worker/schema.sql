@@ -58,6 +58,20 @@ CREATE TABLE IF NOT EXISTS pdf_resources (
   accent TEXT NOT NULL DEFAULT 'text-lead-green',
   badge TEXT NOT NULL DEFAULT '🌱 Psychologie de l''enfant',
   img TEXT NOT NULL DEFAULT '/images/resource_2_emotion_journal.jpg',
+  file_url TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Histoires thérapeutiques (Moulin aux Contes)
+CREATE TABLE IF NOT EXISTS stories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  emoji TEXT NOT NULL DEFAULT '🦉',
+  title TEXT NOT NULL,
+  hero TEXT NOT NULL DEFAULT '',
+  teaching TEXT NOT NULL DEFAULT '',
+  story_snippet TEXT NOT NULL DEFAULT '',
+  parent_tip TEXT NOT NULL DEFAULT '',
+  order_idx INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

@@ -70,114 +70,38 @@ export function ArticlesPage() {
   const categories = ["Tous", "Psychologie", "Parentalité", "Adolescents & Foi", "Spiritualité"];
 
   const [articles, setArticles] = useState<Article[]>([]);
+  const [guides, setGuides] = useState<{ title: string; file_url: string }[]>([]);
 
   useEffect(() => {
-    publicApi.articles().then(data => {
-      if (data.length > 0) setArticles(data as unknown as Article[]);
+    // Downloadable guides come from the managed "Ressources PDF" — the free
+    // lead-magnet guide is therefore fully editable from the dashboard.
+    publicApi.resources().then(data => {
+      setGuides((data as any[])
+        .filter(r => r.file_url)
+        .map(r => ({ title: String(r.title), file_url: String(r.file_url) })));
     });
   }, []);
 
-  const STATIC_ARTICLES: Article[] = [
-    {
-      id: 3,
-      title: "Mon adolescent s’isole : comprendre son repli et rebâtir le lien verbal",
-      desc: "Dans un monde hyperconnecté aux écrans mais de plus en plus isolé verbalement, comment appréhender cliniquement le retrait d'un ado, instaurer des sas d'écoute mutuelle sans forcer le passage, et l'accompagner vers son identité profonde.",
-      content: `Le retrait de l'adolescent dans sa chambre est l'un des motifs de consultation de guidance familiale les plus fréquents. Si la recherche de distance fait partie intégrante du processus normal d'individuation, l'isolement pathologique et le silence obstiné requièrent une attention clinique fine.\n\n### Individuation contre Détresse : Faire la distinction\nL'adolescent normal a besoin de s'extraire de l'espace parental pour expérimenter de nouvelles limites et construire sa propre personnalité. Cependant, si ce retrait s'accompagne d'un changement brusque d'humeur, d'une baisse dramatique des résultats scolaires, ou d'une rupture complète de tout dialogue, la frontière avec un mal-être est franchie.\n\n### Nos recommandations d'intervention :\n1. **Prenez acte sans harceler** : Évitez de crier contre sa chambre fermée. Dites plutôt : "Je respecte ta tranquillité, mais ma porte est ouverte si tu as besoin de parler."\n2. **Instaurez de nouveaux prétextes de partage** : Un trajet en voiture, une sortie pour faire une course à deux... Le silence partagé côte à côte est souvent plus facile à franchir qu'une discussion en face-à-face stricte.\n3. **Mettez en relation avec un tiers bienveillant** : Parfois, l'adolescent n'arrive plus à s'adresser à ses parents directs mais acceptera de se confier à un conseiller, un mentor d'église locale ou un psychologue.\n\nLa patience clinique est ici une vertu sainte : sachez témoigner d'un amour inconditionnel même face au silence apparent.`,
-      tag: "Adolescents & Foi",
-      date: "10 Mai 2026",
-      readTime: "8 min de lecture",
-      img: "/images/article_3_father_teenager.jpg",
-      author: "Lina NGUERELESSIO",
-      role: "Psychologue du Développement (stg)",
-      featured: true
-    },
-    {
-      id: 1,
-      title: "Mettre en place des routines sécurisantes de retour à la maison",
-      desc: "L'importance des rituels de transition psychologiques pour abaisser le niveau de vigilance et d'anxiété de l'enfant de retour chez lui après sa journée scolaire.",
-      content: `Le moment du retour à la maison après l'école est souvent une zone de turbulence majeure au sein des foyers. Pour l'enfant, cette transition représente bien plus qu'un simple déplacement physique : c'est un saut d'un cadre hyper-structuré à un environnement familial d'expression libre.\n\n### Pourquoi cette période est-elle critique ?\nTout au long de sa journée scolaire, l'enfant accumule du stress et contient ses émotions (notamment pour répondre aux exigences sociales et de discipline). En rentrant chez lui, le sentiment de sécurité qu'il éprouve auprès de ses parents libère cette charge de fatigue contenue. C'est ce qu'on appelle la décompression post-scolaire, se manifestant souvent par des crises, de l'opposition ou de l'excitation extrême.\n\n### Notre plan d'action préconisé :\n1. **Le sas de décompression silencieux** : Accordez 15 minutes libres sans questions intrusives de type "Comment s'est passée ta journée ?".\n2. **La collation réconfortante** : Offrez un encas équilibré qui permet de stabiliser sa glycémie.\n3. **Un temps de reconnexion physique** : Un câlin prolongé de 20 secondes suffit à sécréter de l'ocytocine, hormone d'apaisement.\n\nEn appliquant ces rituels simples mais réguliers, vous offrirez à vos enfants l'ancrage psychologique nécessaire pour glisser doucement vers une soirée paisible.`,
-      tag: "Psychologie",
-      date: "25 Mai 2026",
-      readTime: "4 min de lecture",
-      img: "/images/article_1_mother_speaking.jpg",
-      author: "Lina NGUERELESSIO",
-      role: "Psychologue du Développement (stg)"
-    },
-    {
-      id: 2,
-      title: "Gérer la rivalité fraternelle et la jalousie au quotidien",
-      desc: "Des outils de guidance bienveillante inspirés des neurosciences affectives pour pacifier les débordements relationnels entre frères et sœurs.",
-      content: `La jalousie fraternelle est un sentiment archaïque, tout à fait naturel, mais souvent très déstabilisant pour l'harmonie du foyer. Nombreux sont les parents qui se sentent démunis face à l'agressivité répétée de leurs enfants.\n\n### Comprendre le message caché de la jalousie\nLorsqu'un enfant s'en prend à son frère ou à sa sœur, sa peur fondamentale n'est pas de partager ses jouets, mais de perdre sa part exclusive de l'amour et de l'attention de ses parents. La colère est l'expression extérieure d'un besoin intérieur de sécurité affective.\n\n### Pratiques de guidance à adopter :\n- **Bannir les comparaisons** : Des phrases comme "Regarde comme ton frère est sage" amplifient le sentiment d'injustice.\n- **Du temps individuel et exclusif** : Planifiez une "Bulle de rendez-vous" de 10 minutes par jour avec chaque enfant, où vous êtes 100% disponible pour lui seul.\n- **Accueillir la frustration** : Validez son ressenti en formulant : "Je vois que c'est difficile pour toi d'attendre ton tour. Je t'aime aussi."\n\nN'oubliez pas que renforcer la sécurité affective individuelle de chaque enfant demeure l'antidote le plus efficace contre la rivalité.`,
-      tag: "Parentalité",
-      date: "18 Mai 2026",
-      readTime: "5 min de lecture",
-      img: "/images/article_2_wooden_toys.jpg",
-      author: "Lina NGUERELESSIO",
-      role: "Psychologue du Développement (stg)"
-    },
-    {
-      id: 4,
-      title: "Éduquer avec grâce : conjuguer Foi et repères psycho-éducatifs",
-      desc: "Comment allier une théologie saine de la grâce divine avec les limites bienveillantes indispensables aux enfants : pour une éducation harmonieuse.",
-      content: `De nombreux parents croyants se sentent parfois déchirés entre une vision spirituelle sacralisée reposant sur une exigence de soumission absolue, et des enseignements psycho-éducatifs modernes centrés sur l'empathie. Pourtant, ces deux dimensions ne s'opposent pas : elles se subliment.\n\n### La Grâce n'est pas la permissivité\nLa Grâce n'est pas l'absence de règles, mais une manière de rétablir la relation d'amour après la transgression de la règle. Poser un cadre à l'enfant est un acte de haute bienveillance spirituelle.\n\n### Les piliers d'un foyer ancré :\n- **Remplacer la culpabilisation par le pardon mutuel** : Demander pardon à son enfant en tant que parent lorsqu'on s'est emporté est un formidable exemple de maturité spirituelle.\n- **Instaurer la discipline restauratrice** : Il ne s'agit pas de punir pour humilier, mais d'inviter l'enfant à réparer les conséquences de son erreur.\n- **La foi par l'exemple** : Les enfants n'écoutent pas ce que nous disons, ils imitent ce que nous faisons au quotidien.\n\nEn cultivant cette atmosphère de foi aimante et de sécurité psycho-éducative solide, vous élèverez de véritables joyaux précieux, épanouis tant émotionnellement que spirituellement.`,
-      tag: "Spiritualité",
-      date: "03 Mai 2026",
-      readTime: "6 min de lecture",
-      img: "/images/article_4_family_reading_bible.jpg",
-      author: "Lina NGUERELESSIO",
-      role: "Guidance Familiale"
-    },
-    {
-      id: 5,
-      title: "L'art des limites constructives : l'alternative positive aux fessées",
-      desc: "Analyser scientifiquement l'impact négatif des châtiments corporels et découvrir les méthodes éprouvées d'encadrement par la fermeté affectueuse.",
-      content: `Fixer des limites est une nécessité absolue pour le développement cognitif et émotionnel de l'enfant. Face aux oppositions, certains parents ont parfois recours aux châtiments corporels par habitude générationnelle. La Psychologie du Développement moderne permet de formuler des alternatives saines.\n\n### L'impact cérébral des violences physiques\nLes études en neuro-imagerie démontrent que toute violence physique répétée déclenche un état de stress toxique chronique provoquant une atrophie des connexions préfrontales de l'enfant (gérant l'autorégulation de la colère). Par conséquent, la fessée n'apprend pas la leçon morale à l'enfant, elle lui apprend simplement à craindre de se faire attraper.\n\n### Comment imposer son autorité sereinement ?\n- **Consignes claires en phrases affirmatives** : Préférez dire : "Marche doucement" plutôt que "Arrête de courir".\n- **Conséquence logique et réparation** : Si le jouet est jeté au sol, il est retiré pendant 10 minutes.\n- **Le renforcement positif fréquent** : Soulignez explicitement les moments où l'enfant adopte le bon comportement pour ancrer positivement de bonnes habitudes.\n\nL'affirmation d'un cadre solide, sécurisant et habité par la douceur permet de restaurer l'ordre en transmettant la paix.`,
-      tag: "Psychologie",
-      date: "28 Avril 2026",
-      readTime: "5 min de lecture",
-      img: "/images/target_1_gentle_parenting.jpg",
-      author: "Lina NGUERELESSIO",
-      role: "Psychologue du Développement (stg)"
-    },
-    {
-      id: 6,
-      title: "Gérer l'impact des écrans de 0 à 6 ans : Préserver l'attention",
-      desc: "Comment les stimulations visuelles excessives modifient l'architecture cérébrale des tout-petits et comment réagir sainement pour stimuler leur langage.",
-      content: `L'exposition précoce et prolongée des jeunes enfants aux écrans (téléphones, tablettes, télévision) est devenue l'un des plus grands défis de notre décennie. De nombreuses études en neuropsychologie clinique mettent en lumière des corrélations directes entre le temps d'écran et des retards d'acquisition du langage.\n\n### Pourquoi les écrans captivent-ils autant ?\nLes écrans diffusent des flux d'images ultra-rapides, des sons rythmés et des couleurs saturées. Ces stimulus artificiels provoquent des décharges répétées de dopamine dans le cerveau encore immature de l'enfant. Ce dernier s'habitue à un niveau d'excitation très élevé, rendant le monde réel (un livre, un jeu en bois, une conversation tranquille) fade et insipide en comparaison. Cela nuit directement aux capacités de concentration future à l'école.\n\n### Comment instaurer des limites saines sans drame ?\n1. **Appliquer la règle des 3-6-9-12** : Pas d'écran avant 3 ans, pas de console de jeu personnelle avant 6 ans, pas d'Internet sans surveillance avant 9 ans, et pas de réseaux sociaux avant 12 ans.\n2. **Zéro écran le matin et avant le coucher** : Les écrans le matin épuisent l'attention de l'enfant avant l'école. Le soir, la lumière bleue bloque la sécrétion de mélatonine, empêchant un endormissement paisible.\n3. **Proposer des alternatives interactives** : Remplacez les écrans par des moments d'interaction réciproque : lecture partagée, tri d'objets, ou la Malle d'Éveil Joyaux Précieux.\n\nEn remplaçant le virtuel par le relationnel, vous permettez aux connexions neuronales de votre enfant de se développer harmonieusement dans le calme et la joie.`,
-      tag: "Psychologie",
-      date: "12 Avril 2026",
-      readTime: "6 min de lecture",
-      img: "/images/extra_children_reading.jpg",
-      author: "Lina NGUERELESSIO",
-      role: "Psychologue du Développement (stg)"
-    },
-    {
-      id: 7,
-      title: "Le rituel du coucher : Créer un sanctuaire de paix pour la nuit",
-      desc: "Découvrez comment un enchaînement de gestes simples et affectueux apaise le système nerveux de l'enfant et favorise la paix spirituelle du soir.",
-      content: `Le moment du coucher cristallise souvent les tensions accumulées au cours de la journée. Les refus de dormir, les demandes répétées de verres d'eau ou les peurs nocturnes témoignent fréquemment d'une angoisse de séparation de l'enfant face à la nuit.\n\n### Le sommeil : une affaire de transition affective\nPour s'endormir, le cerveau de l'enfant a besoin de passer en mode de parasympathotonie, c'est-à-dire un état de relaxation profonde. Si le coucher est perçu comme une rupture brutale ou une punition, le niveau de cortisol (l'hormone du stress) augmente, rendant l'endormissement biologiquement impossible.\n\n### Construire un rituel apaisant en 4 étapes :\n- **L'extinction des feux progressifs** : Diminuez l'intensité lumineuse de la maison 30 minutes avant l'heure du dodo.\n- **Le temps du conte ou du souvenir** : Lisez une histoire inspirante ou utilisez notre Story Spinner Joyaux Précieux pour inventer un conte rassurant.\n- **Le sas de gratitude** : Encouragez l'enfant à citer 3 belles choses de sa journée pour lesquelles il est reconnaissant. C'est une excellente habitude psychologique et spirituelle.\n- **La bénédiction du soir** : Une prière simple de protection et d'amour pour envelopper l'enfant de paix avant qu'il ne ferme les yeux.\n\nFaire du coucher un espace privilégié de retrouvailles permet à l'enfant de s'endormir confiant, sachant qu'il est profondément aimé et en sécurité.`,
-      tag: "Parentalité",
-      date: "05 Avril 2026",
-      readTime: "5 min de lecture",
-      img: "/images/extra_grandmother_storytelling.jpg",
-      author: "Lina NGUERELESSIO",
-      role: "Guidance Familiale"
-    },
-    {
-      id: 8,
-      title: "L'écoute empathique : Fondement du Standard Divin au sein du couple",
-      desc: "Comment l'harmonie du couple de parents influence directement la sécurité affective des enfants, et comment cultiver un espace de parole authentique.",
-      content: `La première sécurité d'un enfant réside dans la solidité et la paix de l'alliance de ses parents. Les tensions conjugales, même inexprimées à haute voix, créent un climat d'insécurité invisible que l'enfant absorbe comme une éponge.\n\n### Le concept de résonance émotionnelle\nL'enfant possède des neurones miroirs très actifs. Il ressent instantanément la nervosité, la froideur ou la colère latente entre ses parents. Restaurer la communication au sein du couple est donc le premier acte psycho-éducatif de prévention pour la santé mentale des enfants.\n\n### Les clés cliniques pour un dialogue renouvelé :\n- **L'écoute sans interrompre** : Accordez-vous un temps où chacun peut exprimer son ressenti sans que l'autre ne cherche à se justifier ou à apporter une solution immédiate.\n- **Parler en 'Je'** : Remplacez les accusations ('Tu ne m'aides jamais') par l'expression de vos besoins ('Je me sens fatigué(e) et j'aimerais qu'on s'organise ensemble pour le bain des enfants').\n- **La prière de reconnexion** : Pour les couples croyants, s'unir dans une prière simple de réconciliation permet d'abaisser les barrières de l'orgueil et d'accueillir la grâce restauratrice.\n\nLe Standard Divin pour la famille commence par la douceur et le respect mutuel au sommet du foyer. Prenez soin de votre couple, c'est le plus beau cadeau à faire à vos enfants.`,
-      tag: "Spiritualité",
-      date: "28 Mars 2026",
-      readTime: "7 min de lecture",
-      img: "/images/article_4_family_reading_bible.jpg",
-      author: "Lina NGUERELESSIO",
-      role: "Guidance Familiale"
-    }
-  ];
+  useEffect(() => {
+    publicApi.articles().then(data => {
+      const mapped = (data as any[]).map(a => ({
+        id: Number(a.id),
+        title: String(a.title ?? ''),
+        desc: String(a.desc ?? ''),
+        content: String(a.content ?? ''),
+        tag: String(a.tag ?? ''),
+        date: String(a.date ?? ''),
+        readTime: String(a.read_time ?? a.readTime ?? ''),
+        img: String(a.img ?? ''),
+        author: String(a.author ?? 'Lina NGUERELESSIO'),
+        role: String(a.role ?? ''),
+        featured: Number(a.featured) === 1,
+      }));
+      setArticles(mapped);
+    });
+  }, []);
 
-  const displayArticles = articles.length > 0 ? articles : STATIC_ARTICLES;
+  const displayArticles = articles;
   const featuredArticle = displayArticles.find(art => art.featured) || displayArticles[0];
 
   const filteredArticles = displayArticles.filter(art => {
@@ -209,6 +133,11 @@ export function ArticlesPage() {
       setSubError('Erreur réseau, veuillez réessayer.');
     }
   };
+
+  // Dedicated full-page article reader (replaces the old modal bubble)
+  if (selectedArticle) {
+    return <ArticleReader article={selectedArticle} onBack={() => setSelectedArticle(null)} />;
+  }
 
   return (
     <div className="pt-24 min-h-screen bg-bg relative">
@@ -591,25 +520,30 @@ export function ArticlesPage() {
                     
                     <h4 className="text-xl font-bold text-lead-green mb-2">Inscription Validée !</h4>
                     <p className="text-xs text-lead-green/70 leading-relaxed font-semibold mb-6">
-                      Bienvenue au sein du cercle des parents prévoyants. Votre email est bien enregistré — Lina vous envoie personnellement votre guide dans les prochains jours.
+                      Bienvenue au sein du cercle des parents prévoyants. Votre email est bien enregistré.
                     </p>
 
-                    <div className="p-4 bg-mint/55 rounded-2xl border border-lead-green/10 mb-6 text-left flex items-start gap-3">
-                      <span className="text-2xl">🎁</span>
-                      <div>
-                        <h5 className="text-xs font-bold text-lead-green">Guide_Dialogue_Restaurateur.pdf</h5>
-                        <p className="text-[10px] text-lead-green/60 mt-0.5">Fiche clinique d'accompagnement de 12 pages</p>
+                    {guides.length > 0 ? (
+                      <div className="space-y-2.5 text-left">
+                        <p className="text-[10px] font-bold text-lead-green/60 uppercase tracking-wider mb-2">🎁 Vos guides gratuits à télécharger :</p>
+                        {guides.map((g, i) => (
+                          <a key={i} href={g.file_url} download target="_blank" rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 bg-mint/55 rounded-2xl border border-lead-green/10 hover:bg-mint transition-colors">
+                            <span className="text-xl">📄</span>
+                            <span className="text-xs font-bold text-lead-green flex-1 truncate">{g.title}</span>
+                            <Download size={14} className="text-lead-green shrink-0" />
+                          </a>
+                        ))}
                       </div>
-                    </div>
-
-                    <a
-                      href={`https://wa.me/237621479061?text=${encodeURIComponent(`Bonjour Madame Lina, je viens de m'inscrire sur le site avec l'email ${email} — pouvez-vous m'envoyer le guide "Guide_Dialogue_Restaurateur.pdf" ? Merci !`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-3.5 bg-lead-green hover:bg-[#ff9d00] text-white rounded-xl text-xs font-bold uppercase tracking-widest block transition-colors text-center shadow"
-                    >
-                      Recevoir le guide plus vite par WhatsApp 📲
-                    </a>
+                    ) : (
+                      <a
+                        href={`https://wa.me/237621479061?text=${encodeURIComponent(`Bonjour Madame Lina, je viens de m'inscrire sur le site avec l'email ${email} — pouvez-vous m'envoyer votre guide gratuit ? Merci !`)}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="w-full py-3.5 bg-lead-green hover:bg-[#ff9d00] text-white rounded-xl text-xs font-bold uppercase tracking-widest block transition-colors text-center shadow"
+                      >
+                        Recevoir le guide par WhatsApp 📲
+                      </a>
+                    )}
                   </motion.div>
                 )}
 
@@ -619,101 +553,68 @@ export function ArticlesPage() {
         </div>
       </section>
 
-      {/* Grand Full-screen Reading Experience Overlay (Modal dialog) */}
-      <AnimatePresence>
-        {selectedArticle && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#121b16]/70 backdrop-blur-md z-99 flex items-center justify-center p-4 overflow-y-auto font-friendly"
-          >
-            <motion.div
-              initial={{ scale: 0.92, y: 30, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.92, y: 30, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 180 }}
-              className="bg-bg text-lead-green w-full max-w-3xl rounded-[3rem] overflow-hidden shadow-2xl relative my-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Image banner with absolute close handle */}
-              <div className="relative h-64 sm:h-80 bg-mint w-full">
-                <img 
-                  src={selectedArticle.img} 
-                  alt={selectedArticle.title} 
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <button
-                  onClick={() => setSelectedArticle(null)}
-                  className="absolute top-6 right-6 w-11 h-11 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-md text-white flex items-center justify-center cursor-pointer transition-colors border border-white/10"
-                >
-                  <X size={18} />
-                </button>
-                <div className="absolute bottom-6 left-6 right-6 text-white font-friendly">
-                  <span className="bg-[#ff9d00] text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md mb-2 inline-block">
-                    {selectedArticle.tag}
-                  </span>
-                  <p className="text-xs font-mono flex items-center gap-3 text-white/85">
-                    <span className="flex items-center gap-1"><Calendar size={11} /> {selectedArticle.date}</span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1"><Clock size={11} /> {selectedArticle.readTime}</span>
-                  </p>
-                </div>
-              </div>
+    </div>
+  );
+}
 
-              {/* Scrollable content block */}
-              <div className="p-8 sm:p-12 max-h-[55vh] overflow-y-auto custom-scrollbar">
-                <h2 className="text-2xl sm:text-3xl font-bold text-lead-green leading-snug mb-6">
-                  {selectedArticle.title}
-                </h2>
-                
-                {/* Author Info */}
-                <div className="flex items-center gap-3.5 pb-6 border-b border-lead-green/10 mb-8">
-                  <div className="w-10 h-10 rounded-full bg-lead-green/10 border border-lead-green/5 flex items-center justify-center font-friendly font-bold text-lead-green">
-                    LN
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-lead-green leading-none">{selectedArticle.author}</h4>
-                    <p className="text-[10px] uppercase font-bold text-coral tracking-wider mt-1">{selectedArticle.role}</p>
-                  </div>
-                </div>
+// Dedicated full-page article reader (replaces the previous modal overlay)
+function ArticleReader({ article, onBack }: { article: Article; onBack: () => void }) {
+  useEffect(() => { window.scrollTo({ top: 0 }); }, []);
 
-                {/* Body Content */}
-                <div className="text-base text-lead-green/85 leading-relaxed font-semibold space-y-6 whitespace-pre-line antialiased">
-                  {selectedArticle.content}
-                </div>
-                
-                {/* Special quote section */}
-                <div className="mt-10 p-6 bg-mint/50 border-l-4 border-lead-green rounded-r-2xl text-xs md:text-sm font-semibold italic text-lead-green/80 flex gap-3 items-start">
-                  <Heart size={16} className="text-coral shrink-0 mt-0.5 fill-current" />
-                  <span>"Chaque enfant est un joyau précieux façonné de mains divines. Notre rôle clinique et spirituel est d'accompagner patiemment sa taille et son polissage."</span>
-                </div>
-              </div>
+  return (
+    <div className="pt-24 min-h-screen bg-bg relative font-friendly">
+      <article className="max-w-3xl mx-auto px-6 pb-24">
+        <button
+          onClick={onBack}
+          className="mt-6 mb-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-lead-green/70 hover:text-coral transition-colors cursor-pointer"
+        >
+          <ArrowUpRight size={14} className="rotate-[225deg]" /> Retour aux articles
+        </button>
 
-              {/* Modal footer action */}
-              <div className="px-8 sm:px-12 py-6 bg-white border-t border-lead-green/5 flex justify-end gap-3 rounded-b-[3rem]">
-                <button
-                  onClick={() => setSelectedArticle(null)}
-                  className="px-6 py-3 border border-lead-green/10 hover:border-lead-green/30 text-xs font-bold font-friendly uppercase tracking-wider rounded-full cursor-pointer transition-colors"
-                >
-                  Fermer
-                </button>
-                <a
-                  href="#contact"
-                  onClick={() => {
-                    setSelectedArticle(null);
-                  }}
-                  className="px-6 py-3 bg-[#e05a47] text-white text-xs font-bold font-friendly uppercase tracking-wider rounded-full hover:bg-lead-green cursor-pointer transition-colors shadow-sm"
-                >
-                  Contacter Lina
-                </a>
-              </div>
-            </motion.div>
-          </motion.div>
+        <span className="bg-[#ff9d00] text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm inline-block mb-4">
+          {article.tag}
+        </span>
+
+        <h1 className="text-3xl sm:text-4xl font-bold text-lead-green leading-tight mb-4">{article.title}</h1>
+
+        <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-lead-green/50 mb-8">
+          <span className="flex items-center gap-1"><Calendar size={11} /> {article.date}</span>
+          {article.readTime && (<><span>•</span><span className="flex items-center gap-1"><Clock size={11} /> {article.readTime}</span></>)}
+        </div>
+
+        {article.img && (
+          <div className="rounded-[2rem] overflow-hidden bg-mint mb-10 aspect-[16/9]">
+            <img src={article.img} alt={article.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+          </div>
         )}
-      </AnimatePresence>
+
+        <div className="flex items-center gap-3.5 pb-8 border-b border-lead-green/10 mb-8">
+          <div className="w-11 h-11 rounded-full bg-lead-green/10 border border-lead-green/5 flex items-center justify-center font-bold text-lead-green">LN</div>
+          <div>
+            <h4 className="font-bold text-sm text-lead-green leading-none">{article.author}</h4>
+            {article.role && <p className="text-[10px] uppercase font-bold text-coral tracking-wider mt-1">{article.role}</p>}
+          </div>
+        </div>
+
+        <div className="text-base text-lead-green/85 leading-relaxed font-semibold space-y-5 whitespace-pre-line antialiased">
+          {article.content}
+        </div>
+
+        <div className="mt-12 p-6 bg-mint/50 border-l-4 border-lead-green rounded-r-2xl text-sm font-semibold italic text-lead-green/80 flex gap-3 items-start">
+          <Heart size={16} className="text-coral shrink-0 mt-0.5 fill-current" />
+          <span>"Chaque enfant est un joyau précieux façonné de mains divines. Notre rôle clinique et spirituel est d'accompagner patiemment sa taille et son polissage."</span>
+        </div>
+
+        <div className="mt-10 flex flex-col sm:flex-row gap-3">
+          <button onClick={onBack} className="px-6 py-3.5 border border-lead-green/10 hover:border-lead-green/30 text-xs font-bold uppercase tracking-wider rounded-full cursor-pointer transition-colors">
+            ← Tous les articles
+          </button>
+          <a href="https://wa.me/237621479061" target="_blank" rel="noopener noreferrer"
+            className="px-6 py-3.5 bg-[#e05a47] text-white text-xs font-bold uppercase tracking-wider rounded-full hover:bg-lead-green transition-colors shadow-sm text-center">
+            Contacter Lina
+          </a>
+        </div>
+      </article>
     </div>
   );
 }

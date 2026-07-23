@@ -17,6 +17,8 @@ export const publicApi = {
   testimonials: () => get<Record<string, unknown>>('testimonials'),
   pillars:  () => get<Record<string, unknown>>('pillars'),
   steps:    () => get<Record<string, unknown>>('steps'),
+  recommendations: () => get<Record<string, unknown>>('recommendations'),
+  stories:  () => get<Record<string, unknown>>('stories'),
 
   subscribe: async (email: string, name = '', source = 'newsletter'): Promise<{ success?: boolean; message?: string; error?: string }> => {
     const res = await fetch(`${BASE}/emails`, {
