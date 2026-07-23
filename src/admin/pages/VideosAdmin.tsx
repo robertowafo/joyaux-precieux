@@ -3,6 +3,7 @@ import { Layout } from '../components/Layout';
 import { DataTable, Column } from '../components/DataTable';
 import { Modal } from '../components/Modal';
 import { FileUpload } from '../components/FileUpload';
+import { LinkOrUpload } from '../components/LinkOrUpload';
 import { api } from '../lib/api';
 
 interface Video {
@@ -103,9 +104,14 @@ export function VideosAdmin() {
             <input className={input} value={form.duration ?? ''} onChange={e => set('duration', e.target.value)} placeholder="12:45" />
           </Field>
         </div>
-        <Field label="Lien de la vidéo (YouTube, Vimeo...)">
-          <input className={input} type="url" value={form.url ?? ''} onChange={e => set('url', e.target.value)}
-            placeholder="https://youtube.com/watch?v=..." />
+        <Field label="Vidéo (lien YouTube/Vimeo ou fichier)">
+          <LinkOrUpload
+            value={form.url ?? ''}
+            onChange={v => set('url', v)}
+            accept="video/*,.mp4,.webm,.mov"
+            label="une vidéo"
+            linkPlaceholder="https://youtube.com/watch?v=..."
+          />
         </Field>
         <Field label="Intervenant">
           <input className={input} value={form.speaker ?? ''} onChange={e => set('speaker', e.target.value)} />

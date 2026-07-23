@@ -79,7 +79,12 @@ const ALLOWED_COLUMNS: Record<string, string[]> = {
   video_recommendations: ['title', 'url', 'platform', 'desc', 'thumbnail'],
 };
 
-const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'mp3', 'wav', 'ogg', 'm4a', 'mp4', 'webm', 'pdf'];
+const ALLOWED_EXTENSIONS = [
+  'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg',
+  'mp3', 'wav', 'ogg', 'm4a',
+  'mp4', 'webm', 'mov', 'm4v', '3gp',
+  'pdf',
+];
 
 async function handleResource(
   request: Request,

@@ -43,20 +43,41 @@ export const api = {
       body: JSON.stringify({ email, name, source }),
     }).then(r => r.json()),
 
-  // File upload to R2
-  upload: async (file: File): Promise<{ url: string; key: string }> => {
-    const token = getToken();
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch(`${BASE}/upload`, {
-      method: 'POST',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: formData,
+  // File upload to R2 — uses XHR (not fetch) so we can report real upload progress,
+  // which matters a lot on slow connections with large phone-recorded videos.
+  upload: (file: File, onProgress?: (pct: number) => void): Promise<{ url: string; key: string }> => {
+    return new Promise((resolve, reject) => {
+      const token = getToken();
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${BASE}/upload`);
+      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.timeout = 10 * 60 * 1000; // 10 min — generous for large videos on slow connections
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch {
+            reject(new Error('Réponse invalide du serveur'));
+          }
+        } else {
+          let message = `Erreur HTTP ${xhr.status}`;
+          try {
+            const parsed = JSON.parse(xhr.responseText) as { error?: string };
+            if (parsed.error) message = parsed.error;
+          } catch { /* ignore parse failure, keep default message */ }
+          reject(new Error(message));
+        }
+      };
+      xhr.onerror = () => reject(new Error("Erreur réseau pendant l'envoi. Vérifiez votre connexion et réessayez."));
+      xhr.ontimeout = () => reject(new Error('Délai dépassé — fichier trop volumineux ou connexion trop lente.'));
+
+      const formData = new FormData();
+      formData.append('file', file);
+      xhr.send(formData);
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: 'Erreur upload' }));
-      throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`);
-    }
-    return res.json();
   },
 };

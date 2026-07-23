@@ -111,7 +111,7 @@ export function VideoCapsulesAdmin() {
         <Field label="Fichier vidéo (MP4, WEBM...)">
           <FileUpload
             value={form.video_url ?? ''} onChange={v => set('video_url', v)}
-            accept="video/*,.mp4,.webm"
+            accept="video/*,.mp4,.webm,.mov"
             label="un fichier vidéo" previewType="file"
           />
         </Field>

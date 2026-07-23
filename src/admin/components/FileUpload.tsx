@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Upload, X, Loader2, FileText } from 'lucide-react';
+import { Upload, X, Loader2, FileText, AlertCircle } from 'lucide-react';
 import { api } from '../lib/api';
 
 interface FileUploadProps {
@@ -18,17 +18,21 @@ export function FileUpload({
   previewType,
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isImage = previewType === 'image' || (!previewType && accept.includes('image'));
 
   const handleFile = async (file: File) => {
     setUploading(true);
+    setProgress(0);
+    setError('');
     try {
-      const { url } = await api.upload(file);
+      const { url } = await api.upload(file, setProgress);
       onChange(url);
     } catch (e: unknown) {
-      alert('Erreur lors de l\'envoi : ' + (e instanceof Error ? e.message : 'Erreur inconnue'));
+      setError(e instanceof Error ? e.message : 'Erreur inconnue lors de l\'envoi.');
     } finally {
       setUploading(false);
     }
@@ -44,7 +48,7 @@ export function FileUpload({
         onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])}
       />
 
-      {value && (
+      {value && !uploading && (
         <div className="relative inline-flex items-start gap-2">
           {isImage ? (
             <img
@@ -69,19 +73,39 @@ export function FileUpload({
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        disabled={uploading}
-        className="flex items-center justify-center gap-2 w-full px-4 py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-500 hover:border-[#1f4a38] hover:text-[#1f4a38] hover:bg-[#1f4a38]/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {uploading ? (
-          <Loader2 size={14} className="animate-spin" />
-        ) : (
+      {uploading ? (
+        <div className="w-full px-4 py-3 border-2 border-dashed border-[#1f4a38]/30 rounded-xl bg-[#1f4a38]/5">
+          <div className="flex items-center gap-2 text-xs text-[#1f4a38] font-semibold mb-2">
+            <Loader2 size={14} className="animate-spin shrink-0" />
+            Envoi en cours... {progress}%
+          </div>
+          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#1f4a38] rounded-full transition-all duration-200"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-gray-500 mt-1.5">
+            Peut prendre plusieurs minutes pour une vidéo, selon votre connexion — ne fermez pas cette page.
+          </p>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="flex items-center justify-center gap-2 w-full px-4 py-2.5 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-500 hover:border-[#1f4a38] hover:text-[#1f4a38] hover:bg-[#1f4a38]/5 transition-all cursor-pointer"
+        >
           <Upload size={14} />
-        )}
-        {uploading ? 'Envoi en cours...' : value ? `Changer ${label}` : `Charger ${label}`}
-      </button>
+          {value ? `Changer ${label}` : `Charger ${label} depuis cet appareil`}
+        </button>
+      )}
+
+      {error && (
+        <div className="flex items-start gap-1.5 text-[11px] text-red-600 font-medium bg-red-50 border border-red-100 rounded-lg px-2.5 py-2">
+          <AlertCircle size={13} className="shrink-0 mt-0.5" />
+          <span>{error}</span>
+        </div>
+      )}
     </div>
   );
 }

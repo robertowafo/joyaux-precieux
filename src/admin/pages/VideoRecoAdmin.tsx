@@ -3,6 +3,7 @@ import { Layout } from '../components/Layout';
 import { DataTable, Column } from '../components/DataTable';
 import { Modal } from '../components/Modal';
 import { FileUpload } from '../components/FileUpload';
+import { LinkOrUpload } from '../components/LinkOrUpload';
 import { api } from '../lib/api';
 import { ExternalLink } from 'lucide-react';
 
@@ -118,9 +119,14 @@ export function VideoRecoAdmin() {
           <input className={input} value={form.title ?? ''} onChange={e => set('title', e.target.value)}
             placeholder="Nom de la vidéo ou de la conférence" />
         </Field>
-        <Field label="Lien URL de la vidéo *">
-          <input className={input} type="url" value={form.url ?? ''} onChange={e => set('url', e.target.value)}
-            placeholder="https://www.youtube.com/watch?v=..." />
+        <Field label="Vidéo (lien ou fichier) *">
+          <LinkOrUpload
+            value={form.url ?? ''}
+            onChange={v => set('url', v)}
+            accept="video/*,.mp4,.webm,.mov"
+            label="une vidéo"
+            linkPlaceholder="https://www.youtube.com/watch?v=..."
+          />
         </Field>
         <Field label="Plateforme">
           <select className={input} value={form.platform ?? 'YouTube'} onChange={e => set('platform', e.target.value)}>
